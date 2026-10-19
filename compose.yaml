@@ -1,0 +1,50 @@
+name: musecat-partner-example
+x-partner: &partner
+  build: .
+  image: musecat-partner-example:local
+  env_file: .env
+  restart: unless-stopped
+  volumes:
+    - sample-data:/data
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  app:
+    <<: *partner
+    ports:
+      - "127.0.0.1:8088:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+  worker:
+    <<: *partner
+    command: ["python", "-m", "partner.worker"]
+    depends_on:
+      app:
+        condition: service_healthy
+  caddy:
+    image: caddy:2
+    profiles: ["https"]
+    environment:
+      PARTNER_HOST: ${PARTNER_HOST:?Set PARTNER_HOST in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  sample-data:
+  caddy-data:
+  caddy-config:
