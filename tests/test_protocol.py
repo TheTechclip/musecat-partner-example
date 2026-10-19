@@ -366,6 +366,30 @@ class ProtocolTests(unittest.TestCase):
             self.joint("/intents/lookup", payload, key="previous" * 8).status_code, 401
         )
 
+    def test_form_referrer_policy_preserves_origin_without_accepting_null(self):
+        response = self.http.get("/login", base_url=ORIGIN)
+        self.assertEqual(response.headers["Referrer-Policy"], "same-origin")
+        self.assertEqual(
+            self.post(
+                "/login",
+                form={"csrf": self.csrf(), "username": "alice", "password": "d" * 43},
+                headers={"Origin": "null"},
+            ).status_code,
+            403,
+        )
+        response = self.post(
+            "/login",
+            form={"csrf": self.csrf(), "username": "alice", "password": "d" * 43},
+            headers={"Origin": ORIGIN},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            self.http.get("/oauth/musecat/callback", base_url=ORIGIN).headers[
+                "Referrer-Policy"
+            ],
+            "no-referrer",
+        )
+
     def test_uncertain_refresh_is_not_replayed_but_can_still_be_revoked(self):
         token = {
             "access_token": "old-access",

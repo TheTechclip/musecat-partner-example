@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from .common import ProtocolError, csrf
 from .storage import Ledger
@@ -92,7 +92,9 @@ def create_app(overrides=None):
         response.headers.update(
             {
                 "Cache-Control": "no-store",
-                "Referrer-Policy": "no-referrer",
+                "Referrer-Policy": "no-referrer"
+                if request.path == "/oauth/musecat/callback"
+                else "same-origin",
                 "X-Content-Type-Options": "nosniff",
                 "Content-Security-Policy": "default-src 'self'; style-src 'self'; frame-ancestors 'none'; form-action 'self' "
                 + app.config["MUSECAT_ISSUER"]
