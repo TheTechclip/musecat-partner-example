@@ -180,3 +180,7 @@ CI에서도 테스트와 Compose 검증 및 Docker 빌드를 실행합니다.
 이 샘플은 뮤즈캣 연동 학습용이며 OAuth/OIDC 제공자 전체 구현이 아닙니다.
 규격의 정본은 위의 Musecat 연동 문서입니다. Flask와 cryptography 의존성 정보는 각각
 [Flask PyPI](https://pypi.org/project/Flask/), [cryptography PyPI](https://pypi.org/project/cryptography/)를 참고하세요.
+
+## 츄니즘 화면용 전적 항목
+
+가상 응답에는 `rating`, `rating_max`, `over_power`, `played_chart_count`, `full_combo_count`, `all_justice_count`, `last_played_at`, `last_synced_at`이 들어 있습니다. `rank_distribution` 섹션은 `rank` 열(타입 `rank`)과 `count` 열(타입 `integer`)을 제공합니다. Musecat은 이 선택적 키를 츄니즘 레이팅·달성률·랭크 UI로 변환할 수 있습니다. `played_chart_count`는 서로 다른 플레이한 보면 수이며 플레이 횟수가 아닙니다. 알 수 없는 값은 0으로 채우지 않고 생략합니다. 전송 규격은 계속 `musecat-records/v1`이며 별도의 싱크 API를 만들지 않습니다. 출처에는 가상 데이터임을 명시합니다.

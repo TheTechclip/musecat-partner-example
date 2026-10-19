@@ -153,3 +153,7 @@ Tests cover PKCE, code/refresh replay rejection, scope isolation, private record
 - To rotate an inbound Joint key, put the old key in `MUSECAT_TO_PARTNER_PREVIOUS_KEY`, set `PREVIOUS_KEY_EXPIRES_AT` to the Unix timestamp 24 hours ahead, and replace the current key. Update the partner-issued key in Musecat, then clear the previous-key configuration after the grace period.
 
 The Musecat specification above is authoritative. Dependency information: [Flask](https://pypi.org/project/Flask/), [cryptography](https://pypi.org/project/cryptography/).
+
+## CHUNITHM presentation fields
+
+The synthetic response includes `rating`, `rating_max`, `over_power`, `played_chart_count`, `full_combo_count`, `all_justice_count`, `last_played_at`, and `last_synced_at`. The `rank_distribution` section has a `rank` column (type `rank`) and `count` column (type `integer`). Musecat can map these optional keys to its CHUNITHM rating, achievement, and rank UI. `played_chart_count` counts distinct charts; it is not a play count. Unknown values should be omitted, not filled with zero. The transport remains `musecat-records/v1`; these keys do not create another synchronization API. The source remains explicitly synthetic.

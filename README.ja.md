@@ -153,3 +153,7 @@ docker compose config --quiet
 - Joint 受信キーを更新する場合、旧キーを `MUSECAT_TO_PARTNER_PREVIOUS_KEY` に、24時間後の Unix 秒を `PREVIOUS_KEY_EXPIRES_AT` に設定し、現在のキーを変更します。Musecat のパートナー発行キーも更新し、猶予期間後に旧キー設定を空にします。
 
 正式な仕様は上記 Musecat 連携文書を参照してください。依存パッケージ情報: [Flask](https://pypi.org/project/Flask/)、[cryptography](https://pypi.org/project/cryptography/)。
+
+## CHUNITHM 表示用の記録項目
+
+架空の応答には `rating`、`rating_max`、`over_power`、`played_chart_count`、`full_combo_count`、`all_justice_count`、`last_played_at`、`last_synced_at` を含めます。`rank_distribution` セクションは `rank` 列（型 `rank`）と `count` 列（型 `integer`）を提供します。Musecat はこれらの任意キーをレーティング・達成率・ランクの UI に変換できます。`played_chart_count` はプレイ済みの異なる譜面数で、プレイ回数ではありません。不明な値は0で埋めず省略します。通信仕様は引き続き `musecat-records/v1` であり、別の同期 API は作りません。出典には架空のデータであることを明示します。

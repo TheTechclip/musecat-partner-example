@@ -256,16 +256,107 @@ def records(service):
                 "value": 16.42,
                 "precision": 2,
             },
-            {
-                "key": "plays",
-                "label": {
-                    "ko": "데모 플레이 수",
-                    "en": "Demo plays",
-                    "ja": "デモプレイ回数",
-                },
-                "type": "integer",
-                "value": 123,
-            },
+            *[
+                {
+                    "key": key,
+                    "label": {"en": en, "ko": ko, "ja": ja},
+                    "type": kind,
+                    "value": value,
+                }
+                for key, en, ko, ja, kind, value in [
+                    (
+                        "rating_max",
+                        "Demo max rating",
+                        "데모 최고 레이팅",
+                        "デモ最高レーティング",
+                        "decimal",
+                        16.58,
+                    ),
+                    (
+                        "over_power",
+                        "Demo OVER POWER",
+                        "데모 OVER POWER",
+                        "デモ OVER POWER",
+                        "decimal",
+                        12345.67,
+                    ),
+                    (
+                        "played_chart_count",
+                        "Demo played charts",
+                        "데모 플레이한 보면",
+                        "デモプレイ譜面数",
+                        "integer",
+                        123,
+                    ),
+                    (
+                        "full_combo_count",
+                        "Demo FULL COMBO",
+                        "데모 FULL COMBO",
+                        "デモ FULL COMBO",
+                        "integer",
+                        80,
+                    ),
+                    (
+                        "all_justice_count",
+                        "Demo ALL JUSTICE",
+                        "데모 ALL JUSTICE",
+                        "デモ ALL JUSTICE",
+                        "integer",
+                        30,
+                    ),
+                    (
+                        "last_played_at",
+                        "Demo last played",
+                        "데모 마지막 플레이",
+                        "デモ最終プレイ",
+                        "datetime",
+                        "2026-10-19T01:00:00Z",
+                    ),
+                    (
+                        "last_synced_at",
+                        "Demo last synced",
+                        "데모 마지막 동기화",
+                        "デモ最終同期",
+                        "datetime",
+                        stamp(),
+                    ),
+                ]
+            ],
         ],
-        sections=[],
+        player={
+            "name": "Demo " + grant["user"].title(),
+            "title": "Synthetic CHUNITHM records",
+            "level": 85,
+            "team": "Musecat Demo",
+        },
+        sections=[
+            {
+                "key": "rank_distribution",
+                "label": {
+                    "ko": "가상 랭크 분포",
+                    "en": "Synthetic rank distribution",
+                    "ja": "架空のランク分布",
+                },
+                "columns": [
+                    {
+                        "key": "rank",
+                        "label": {"en": "Rank", "ko": "랭크", "ja": "ランク"},
+                        "type": "rank",
+                    },
+                    {
+                        "key": "count",
+                        "label": {"en": "Charts", "ko": "보면", "ja": "譜面"},
+                        "type": "integer",
+                    },
+                ],
+                "rows": [
+                    ["SSS+", 30],
+                    ["SSS", 28],
+                    ["SS+", 25],
+                    ["SS", 20],
+                    ["S+", 12],
+                    ["S", 8],
+                ],
+            }
+        ],
     )

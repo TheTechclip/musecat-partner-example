@@ -109,6 +109,31 @@ class ProtocolTests(unittest.TestCase):
         response = self.post("/connect/joint", form={"csrf": self.csrf()})
         self.assertIn("/ja/connect/example_test?", response.location)
 
+    def test_synthetic_record_vocabulary_matches_profile_presentation(self):
+        code = self.code()
+        token = self.exchange(code).json["access_token"]
+        response = self.http.get(
+            "/api/records/chunithm",
+            base_url=ORIGIN,
+            headers={"Authorization": "Bearer " + token},
+        )
+        self.assertEqual(response.status_code, 200)
+        record = response.json
+        self.assertEqual(record["sub"], "sample:alice")
+        self.assertIn("synthetic", record["source"]["name"])
+        fields = {field["key"]: field for field in record["fields"]}
+        self.assertEqual(fields["rating"]["value"], 16.42)
+        self.assertEqual(fields["rating_max"]["value"], 16.58)
+        self.assertEqual(fields["played_chart_count"]["value"], 123)
+        self.assertEqual(fields["full_combo_count"]["value"], 80)
+        self.assertEqual(fields["all_justice_count"]["value"], 30)
+        ranks = record["sections"][0]
+        self.assertEqual(ranks["key"], "rank_distribution")
+        self.assertEqual(sum(row[1] for row in ranks["rows"]), 123)
+        self.assertTrue(
+            all(set(field["label"]) == {"en", "ko", "ja"} for field in record["fields"])
+        )
+
     def tearDown(self):
         self.directory.cleanup()
 
