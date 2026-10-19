@@ -19,6 +19,35 @@ A runnable **development and testing sample** for Musecat Preview. Python + Flas
 
 This example uses the delegation scope `account:access` and the documented `/developer/v1/account/*` APIs as well as `/developer/v1/me`. It does not demonstrate the separate sign-in scopes `openid profile arcade:read`.
 
+## Choose a connection before configuring keys
+
+“Direction” below describes **data access**, not which website is opened first.
+
+| Goal | Start here | Registration JSON | Musecat-issued secret needed by sample |
+| --- | --- | --- | --- |
+| Sample reads Musecat profile/APIs (A only) | Demo sign-in → **Connect Musecat data only** | `/onboarding.json?flow=a` | `MUSECAT_CLIENT_SECRET` |
+| Musecat reads sample CHUNITHM records (B only) | Musecat settings → ordinary external account connection → this sample → select CHUNITHM → connect | `/onboarding.json?flow=b` | None; configure the generated partner OAuth client ID/secret in Musecat |
+| Both directions with managed shared consent | **One-click bilateral connection** in either service | `/onboarding.json?flow=joint` (default) | `MUSECAT_CLIENT_SECRET` and `PARTNER_TO_MUSECAT_KEY`; also exchange the generated partner OAuth credentials and `MUSECAT_TO_PARTNER_KEY` |
+
+All modes still use the generated local session/encryption/demo secrets. Generated keys for unused modes may remain in `.env`; you do not need to exchange them. App approval and exact callback matching still apply. The current Musecat registration contract requires an A callback even for a B-only template; it is retained in that JSON but is not invoked by the B flow. Do not register the three templates as successive updates merely to switch demo buttons: an already approved full app can exercise A, B and Joint independently, and approved configuration changes can invalidate grants.
+
+For A, success means the sample displays a **one-way Musecat API connection** and can read the public profile. `account:access` also authorizes documented general-user mutations; this is not a read-only scope or OIDC sign-in. For B, success means Musecat shows the connected account and can fetch synthetic records. Enable **profile sharing** separately, then verify the public profile. Sample-side grant counts show issued/exchanged permission, not Musecat's cached or currently displayed profile. Manage B-only disconnection in Musecat settings. A-only disconnection does not revoke an independent B grant. Two independent grants do not automatically become a managed Joint pair.
+
+Use `bob` to try another mode without disturbing Alice's demonstration. A different sample account does not bypass Musecat's account-binding rules: do not approve the same Musecat account into a conflicting demo binding. Disconnect deliberately before changing bindings. This sample demonstrates account linking; standalone “Sign in with Musecat” (`openid profile arcade:read`, nonce and ID-token validation) requires the separate official login guide.
+
+### When first connection fails
+
+| Symptom | Check / next action |
+| --- | --- |
+| Missing/disabled A action | Obtain the approved app's Client Secret and set `MUSECAT_CLIENT_SECRET`; no Joint key exchange is needed |
+| Missing provider in Musecat | Confirm app approval, approved Direction B declaration and partner OAuth credentials in Developer Center |
+| `invalid_origin` | Open the exact HTTPS `PARTNER_ORIGIN`; after a tunnel change update origin, approved URLs and recreate containers |
+| `invalid_client` or callback rejection | Check credential issuer/direction and exact registered callback, including locale-independent B callback |
+| `invalid_grant`, invalid state, expired flow | Start a fresh flow in the same browser session; do not reuse a callback/code; reconnect if refresh was consumed |
+| `records_private` or profile shows nothing | Check sample privacy, Musecat service's profile-sharing switch, cache status and refresh limit |
+| HTTP 429 | Respect the endpoint's retry window; do not automatically rerun every API example |
+
+
 ## 1. Run locally
 
 Requires Docker Compose, Python 3 for initialization, and a public HTTPS origin: Musecat must call this server directly, so a localhost-only URL cannot be registered.
@@ -67,7 +96,7 @@ The sample supports English, Korean, and Japanese. Choose a language at the top 
 The sample starts without Musecat-issued keys. Sign in as `alice` or `bob` using `DEMO_PASSWORD` from `.env`.
 
 1. Open **App registration JSON** (`/onboarding.json`), populated with the actual URLs and generated `PARTNER_ID`.
-2. Register an app in Developer Center and enter its general information, Direction A, Direction B, and Joint settings from that JSON. Replace `contact_email` with your contact address.
+2. Register an app in Developer Center using the selected flow JSON. Enter general information and only the directions present in that template. Replace `contact_email` with your contact address.
 3. Request Musecat operator approval. The sample does not bypass approval.
 4. Exchange the credentials below. Keep values server-side; do not publish them in GitHub issues, screenshots, or frontend JavaScript.
 
@@ -187,3 +216,5 @@ curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.y
 Tests verify complete operation/media coverage, fixed-origin request routing, server-side token handling, write confirmation, HTTP error display, full-profile composition, and disconnect races. Standard domain validation, roles, visibility, GPS requirements and rate limits still apply on Musecat.
 
 [Developer API verification](docs/developer-api-test-results.md)
+
+A source-based review of remaining onboarding gaps is available in [Korean](docs/onboarding-review.ko.md).

@@ -22,3 +22,11 @@ Live verification after the development backend rollout, using the existing encr
 - Passport aggregates and stamps match the ordinary public responses for the connected user's current settings (HTTP 200). The private/summary/full matrix is covered by disposable Core fixtures, without changing the real user's privacy settings.
 - External nearby discovery returns HTTP 200. The deployed OpenAPI and running sample both exclude the bulk-list operations.
 - The quota failure during the first build was resolved by expanding the development instance root from 64GiB to 128GiB. The development DB backup was verified before rollout. No schema migration was required.
+
+## Independent one-way flow verification
+
+- All **25 sample tests pass**, including independent A completion/disconnection with no Joint key or reverse grant, independent B consent/records/revocation without a Musecat API secret/link, and three distinct registration templates.
+- On the running HTTPS tunnel, an isolated Bob browser session used live Musecat metadata and reached the A authorization redirect with `account:access` and S256. It did not approve a new Musecat grant or complete a new A connection against Preview.
+- Over real HTTP against the running sample, a Bob-only B grant completed sample consent, PKCE code exchange, synthetic records retrieval and revocation. This exercised the sample endpoints as the registered Musecat client; it did not create a new B-only connection in Musecat's UI.
+- All three `/onboarding.json?flow=a|b|joint` responses have the expected declarations. Korean browser inspection confirmed separate A/B/Joint cards and current grant status. The existing Alice bilateral demonstration was retained.
+- Background-free developer onboarding findings and remaining platform constraints are documented in [the review](onboarding-review.ko.md).

@@ -19,6 +19,35 @@ Musecat Preview と連携する **開発・テスト用サンプル**です。Py
 
 この例は権限委譲 scope `account:access` と `/developer/v1/account/*`、`/developer/v1/me` API を使用します。ログイン専用の `openid profile arcade:read` を使う例とは別です。
 
+## 最初に連携の目的を選ぶ
+
+以下の方向は **データへのアクセス方向**であり、開始するサイトとは別です。
+
+| 目的 | 開始位置 | 登録 JSON | サンプルに必要な Musecat 発行シークレット |
+| --- | --- | --- | --- |
+| サンプルから Musecat プロフィール/API を取得（A のみ） | デモログイン → **Musecat 情報のみ連携** | `/onboarding.json?flow=a` | `MUSECAT_CLIENT_SECRET` |
+| Musecat からサンプル記録を取得（B のみ） | Musecat 設定 → 通常の外部アカウント連携 → サンプルの CHUNITHM を選択して接続 | `/onboarding.json?flow=b` | 不要。生成済みパートナー OAuth ID/シークレットを Musecat に設定 |
+| 統合同意で双方向連携 | どちらのサービスでも **ワンクリック双方向連携** | `/onboarding.json?flow=joint`（既定） | `MUSECAT_CLIENT_SECRET` と `PARTNER_TO_MUSECAT_KEY`。生成済み OAuth 情報と `MUSECAT_TO_PARTNER_KEY` も Musecat に設定 |
+
+すべてのモードは生成済みのローカルセッション・暗号化・デモ用シークレットを使います。未使用モードのキーは `.env` に残せますが、交換は不要です。アプリ承認と正確なコールバック登録は共通です。現在の Musecat 登録契約は **B のみでも A コールバックを必須**とするため、B JSON にも残します。B フローはそのコールバックを呼びません。承認済みの全機能アプリなら登録変更なしで三つのフローを個別に試せます。ボタンを切り替えるために三つの JSON を交互に再申請しないでください。承認設定の変更は既存の同意を無効にする場合があります。
+
+A は **片方向 Musecat API 連携**が表示され、公開プロフィールを取得できれば成功です。`account:access` は文書化された一般ユーザーの更新操作も許可し、読み取り専用 scope や OIDC ログインではありません。B は Musecat でアカウント接続と架空記録の取得を確認します。**プロフィール公開は別に有効化**して公開プロフィールを確認してください。サンプルの同意数はトークン交換済みの権限であり、Musecat のキャッシュ・実際の表示状態を保証しません。B のみの解除は Musecat 設定で行います。A のみ解除しても独立した B 権限は残ります。個別の同意二つが自動的に共同連携になることはありません。
+
+Alice のデモを保って別のモードを試すには `bob` を使います。ただし Musecat のアカウント重複連携ルールは適用されます。同じ Musecat アカウントを競合するデモに承認せず、変更時は既存連携を明示的に解除してください。独立した **Musecat でログイン**には `openid profile arcade:read`・nonce・ID token 検証が必要で、このサンプルはそのログイン専用フローを実装しません。
+
+### 最初の接続に失敗した場合
+
+| 症状 | 確認・復旧 |
+| --- | --- |
+| A ボタンが無効 | 承認済み Client Secret を `MUSECAT_CLIENT_SECRET` に設定。双方向キーの交換は不要 |
+| Musecat にプロバイダーがない | 開発者センターの承認、承認済み B 宣言、パートナー OAuth 資格情報を確認 |
+| `invalid_origin` | 正確な HTTPS `PARTNER_ORIGIN` で開く。トンネル変更後は origin・承認 URL を更新しコンテナーを再作成 |
+| `invalid_client`・コールバック拒否 | キーの発行元・方向と登録コールバックの完全一致を確認 |
+| `invalid_grant`・state 不一致・期限切れ | 同じブラウザーセッションで開始し直す。コード・コールバックは再利用せず、refresh 消費後は再接続 |
+| `records_private`・記録が表示されない | サンプルの公開状態、Musecat の公開スイッチ、キャッシュ・更新制限を確認 |
+| HTTP 429 | API の再試行時間を守り、全サンプルの自動反復を避ける |
+
+
 ## 1. ローカル起動
 
 Docker Compose、初期化用の Python 3、公開 HTTPS origin が必要です。Musecat がサンプルサーバーを直接呼び出すため、localhost のみの URL は登録できません。
@@ -67,7 +96,7 @@ docker compose --profile https up -d --build
 Musecat 発行キーがなくてもサンプルは起動します。`.env` の `DEMO_PASSWORD` を使い、`alice` または `bob` でログインします。
 
 1. **アプリ登録 JSON** (`/onboarding.json`) を開きます。実際の URL と生成済み `PARTNER_ID` が含まれます。
-2. 開発者センターでアプリを登録し、JSON の基本情報・Direction A・Direction B・Joint 設定を入力します。`contact_email` を自分の連絡先に変更します。
+2. 開発者センターで選択したフローの JSON を使って登録し、基本情報とその JSON に含まれる方向だけを入力します。`contact_email` を自分の連絡先に変更します。
 3. Musecat 運営者に承認を申請します。サンプルで承認を迂回することはありません。
 4. 以下の認証情報を交換します。値はサーバー専用です。GitHub Issue、スクリーンショット、フロントエンド JavaScript に載せないでください。
 
@@ -189,3 +218,5 @@ curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.y
 [開発者 API 検証結果](docs/developer-api-test-results.md)
 
 外部アプリのプロフィール取得は一般の第三者と同じ公開設定に従います。非公開のお気に入り・ゲームは除外し、国の表示設定も尊重します。非公開パスポートは取得できず、概要公開では訪問日を除外します。全店舗一覧 API は外部に提供せず、個別取得と周辺検索は利用できます。
+
+残るオンボーディング課題は [韓国語のレビュー](docs/onboarding-review.ko.md)に整理しています。

@@ -78,9 +78,9 @@ MESSAGES = {
     },
     "disconnect": {"en": "Disconnect", "ko": "연결 해제", "ja": "連携を解除"},
     "not_connected": {
-        "en": "Not connected.",
-        "ko": "연결되지 않았습니다.",
-        "ja": "連携されていません。",
+        "en": "Musecat API access is not connected.",
+        "ko": "뮤즈캣 API 접근이 연결되지 않았습니다.",
+        "ja": "Musecat API アクセスは未連携です。",
     },
     "setup_hint": {
         "en": "First get your app approved in Musecat Developer Center, then set the Musecat-issued keys in .env.",
@@ -304,6 +304,92 @@ MESSAGES.update(
             "ko": "총 오락실 방문",
         },
         "visit_days": {"en": "Visit days", "ja": "訪問した日数", "ko": "방문한 날"},
+    }
+)
+
+
+MESSAGES.update(
+    {
+        "flow_a_title": {
+            "en": "A · Read Musecat data in this sample",
+            "ko": "A · 예제에서 뮤즈캣 정보 조회",
+            "ja": "A · サンプルで Musecat 情報を取得",
+        },
+        "flow_a_hint": {
+            "en": "Musecat → sample. Grant access to Musecat APIs only. This does not give Musecat access to the sample records.",
+            "ko": "뮤즈캣 → 예제. 뮤즈캣 API 접근만 동의합니다. 이 연결만으로 뮤즈캣이 예제 전적을 읽을 수는 없습니다.",
+            "ja": "Musecat → サンプル。Musecat API へのアクセスだけに同意します。この連携だけでは Musecat はサンプル記録を取得できません。",
+        },
+        "connect_oauth": {
+            "en": "Connect Musecat data only",
+            "ko": "뮤즈캣 정보만 연결",
+            "ja": "Musecat 情報のみ連携",
+        },
+        "a_setup_hint": {
+            "en": "Set MUSECAT_CLIENT_SECRET after app approval. Joint keys are not needed for this flow.",
+            "ko": "앱 승인 후 MUSECAT_CLIENT_SECRET을 설정하세요. 이 흐름에는 양방향 연결 키가 필요 없습니다.",
+            "ja": "アプリ承認後に MUSECAT_CLIENT_SECRET を設定してください。このフローに双方向用キーは不要です。",
+        },
+        "flow_a_registration": {
+            "en": "Registration JSON · Musecat data only",
+            "ko": "등록 JSON · 뮤즈캣 정보 조회만",
+            "ja": "登録 JSON · Musecat 情報のみ",
+        },
+        "flow_b_title": {
+            "en": "B · Show sample records on Musecat",
+            "ko": "B · 뮤즈캣에 예제 전적 표시",
+            "ja": "B · Musecat にサンプル記録を表示",
+        },
+        "flow_b_hint": {
+            "en": "Sample → Musecat. In Musecat settings, find {partner} in ordinary external account connections and connect CHUNITHM. Use its regular Connect action, rather than the bilateral section. Enable profile sharing and refresh records there.",
+            "ko": "예제 → 뮤즈캣. 뮤즈캣 설정의 일반 외부 계정 연결에서 {partner}의 CHUNITHM을 선택하고 연결하세요. 양방향 연결 영역과 별도입니다. 연결 후 프로필 공개를 켜고 전적을 새로고침하세요.",
+            "ja": "サンプル → Musecat。Musecat 設定の通常の外部アカウント連携で {partner} の CHUNITHM を選んで接続します。双方向連携とは別です。接続後、プロフィール公開を有効にして記録を更新してください。",
+        },
+        "flow_b_start": {
+            "en": "Open Musecat account connections",
+            "ko": "뮤즈캣 계정 연결 열기",
+            "ja": "Musecat アカウント連携を開く",
+        },
+        "flow_b_registration": {
+            "en": "Registration JSON · records, no joint flow",
+            "ko": "등록 JSON · 전적 제공, 양방향 제외",
+            "ja": "登録 JSON · 記録提供、双方向なし",
+        },
+        "record_grants": {
+            "en": "Active record permissions issued by this sample: {count}",
+            "ko": "이 예제에서 발급한 유효한 전적 접근 동의: {count}건",
+            "ja": "このサンプルが発行した有効な記録アクセス同意: {count} 件",
+        },
+        "record_grants_hint": {
+            "en": "This counts exchanged, unrevoked partner grants, including bilateral grants. Check Musecat settings for its current connection, cached records and profile sharing. Record permission does not imply reverse API access.",
+            "ko": "토큰 교환이 완료되고 해제되지 않은 동의 수이며 양방향 동의도 포함합니다. 뮤즈캣의 실제 연결·전적 캐시·프로필 공개 상태는 뮤즈캣 설정에서 확인하세요. 전적 동의가 역방향 API 접근을 뜻하지는 않습니다.",
+            "ja": "トークン交換済みで未解除の同意数で、双方向の同意も含みます。Musecat 側の接続・記録キャッシュ・プロフィール公開状態は Musecat 設定で確認してください。記録の同意は逆方向の API アクセスを意味しません。",
+        },
+        "flow_joint_hint": {
+            "en": "Both directions with one combined consent. Both exchanges must complete. Independent one-way connections do not become a managed bilateral connection automatically.",
+            "ko": "한 번의 통합 동의로 양쪽 방향을 연결합니다. 두 토큰 교환이 모두 완료되어야 합니다. 단방향 두 개를 연결해도 자동으로 공동 연결이 되지는 않습니다.",
+            "ja": "一度の統合同意で両方向を連携します。両方のトークン交換の完了が必要です。個別の片方向連携を二つ作っても、自動的に管理された双方向連携にはなりません。",
+        },
+        "joint_registration": {
+            "en": "Registration JSON · bilateral",
+            "ko": "등록 JSON · 양방향",
+            "ja": "登録 JSON · 双方向",
+        },
+        "change_mode_hint": {
+            "en": "Disconnect the current Musecat data connection before starting a different mode. A separate record-only grant is managed in Musecat settings.",
+            "ko": "다른 모드를 시작하려면 현재 뮤즈캣 정보 연결을 먼저 해제하세요. 별도의 전적 전용 연결은 뮤즈캣 설정에서 관리합니다.",
+            "ja": "別のモードを開始する前に現在の Musecat 情報連携を解除してください。独立した記録専用連携は Musecat 設定で管理します。",
+        },
+        "oneway_mode": {
+            "en": "One-way Musecat API connection",
+            "ko": "단방향 뮤즈캣 API 연결",
+            "ja": "片方向 Musecat API 連携",
+        },
+        "joint_mode": {
+            "en": "Bilateral connection",
+            "ko": "양방향 연결",
+            "ja": "双方向連携",
+        },
     }
 )
 

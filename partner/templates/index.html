@@ -18,12 +18,26 @@
   {% if not user %}<section><h2>{{ t('get_started') }}</h2><p>{{ t('get_started_hint') }}</p><a class="button" href="/login">{{ t('open_login') }}</a></section>
   {% else %}
   <section><div class="heading"><h2>{{ t('demo_name', name=user|title) }}</h2><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form></div>
-    {% if link %}<p class="status">{{ t('partial' if link.partial else 'connected') }}</p><p>Musecat: {{ link.name }}</p><p class="muted">{{ link.sub }}</p>
+    {% if link %}<p class="status">{{ t('partial' if link.partial else 'connected') }}</p><p>{{ t('joint_mode' if link.pair_id else 'oneway_mode') }}</p><p>Musecat: {{ link.name }}</p><p class="muted">{{ link.sub }}</p>
       <div class="actions"><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if link.partial %}disabled{% endif %}>{{ t('profile') }}</button></form><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="refresh" value="yes"><button class="secondary" {% if link.partial %}disabled{% endif %}>{{ t('refresh_profile') }}</button></form><form action="/disconnect" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('disconnect_joint' if link.pair_id else 'disconnect') }}</button></form></div>
-    {% else %}<p>{{ t('not_connected') }}</p>{% if not ready %}<p class="notice">{{ t('setup_hint') }}</p>{% endif %}
-      <div class="actions"><form action="/connect/joint" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if not ready %}disabled{% endif %}>{{ t('connect_joint') }}</button></form><form action="/connect/musecat" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary" {% if not ready %}disabled{% endif %}>{{ t('connect_oauth') }}</button></form></div>
+    {% else %}<p>{{ t('not_connected') }}</p>
     {% endif %}
     {% if pending %}<p class="notice">{{ t('pending', count=pending) }}</p>{% endif %}
+  </section>
+  <section aria-labelledby="flow-a"><h2 id="flow-a">{{ t('flow_a_title') }}</h2><p>{{ t('flow_a_hint') }}</p>
+    {% if not link %}<form action="/connect/musecat" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if not a_ready %}disabled{% endif %}>{{ t('connect_oauth') }}</button></form>{% else %}<p class="status">{{ t('partial' if link.partial else 'connected') }}</p>{% endif %}
+    {% if not a_ready %}<p class="notice">{{ t('a_setup_hint') }}</p>{% endif %}
+    <p><a href="/onboarding.json?flow=a">{{ t('flow_a_registration') }}</a></p>
+  </section>
+  <section aria-labelledby="flow-b"><h2 id="flow-b">{{ t('flow_b_title') }}</h2><p>{{ t('flow_b_hint', partner=partner_id) }}</p>
+    <a class="button secondary" href="{{ musecat_web }}/{{ musecat_locale }}/settings/connections" rel="noreferrer">{{ t('flow_b_start') }}</a>
+    <p>{{ t('record_grants', count=record_grants) }}</p><p class="muted">{{ t('record_grants_hint') }}</p>
+    <p><a href="/onboarding.json?flow=b">{{ t('flow_b_registration') }}</a></p>
+  </section>
+  <section aria-labelledby="flow-joint"><h2 id="flow-joint">{{ t('connect_joint') }}</h2><p>{{ t('flow_joint_hint') }}</p>
+    <form action="/connect/joint" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if not joint_ready or link %}disabled{% endif %}>{{ t('connect_joint') }}</button></form>
+    {% if link %}<p class="muted">{{ t('change_mode_hint') }}</p>{% elif not joint_ready %}<p class="notice">{{ t('setup_hint') }}</p>{% endif %}
+    <p><a href="/onboarding.json?flow=joint">{{ t('joint_registration') }}</a></p>
   </section>
   <section><h2>{{ t('records') }}</h2><div class="stats"><div><span>{{ t('rating') }}</span><strong>16.42</strong></div><div><span>{{ t('plays') }}</span><strong>123</strong></div></div><p>{{ t('visibility', visibility=t('private' if private else 'public')) }}</p><form action="/records/privacy" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="private" value="{{ 'no' if private else 'yes' }}"><button class="secondary">{{ t('make_public' if private else 'make_private') }}</button></form></section>
   <section><h2>{{ t('refresh_test') }}</h2><p>{{ t('refresh_hint') }}</p><form action="/testing/expire-access" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('expire') }}</button></form></section>

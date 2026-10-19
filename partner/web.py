@@ -40,6 +40,11 @@ def home():
         link = ledger().get(tx, "link", user()) if user() else None
         private = bool(ledger().get(tx, "private", user())) if user() else False
         pending = len(ledger().items(tx, "outbox"))
+        record_grants = sum(
+            1
+            for _, grant in ledger().items(tx, "grant")
+            if grant["user"] == user() and not grant["revoked"] and grant["exchanged"]
+        )
     return render_template(
         "index.html",
         mode="home",
@@ -47,7 +52,10 @@ def home():
         link=link,
         private=private,
         pending=pending,
-        ready=bool(
+        record_grants=record_grants,
+        partner_id=current_app.config["PARTNER_ID"],
+        a_ready=bool(current_app.config["MUSECAT_CLIENT_SECRET"]),
+        joint_ready=bool(
             current_app.config["MUSECAT_CLIENT_SECRET"]
             and current_app.config["PARTNER_TO_MUSECAT_KEY"]
         ),
@@ -95,7 +103,10 @@ def privacy():
 @bp.get("/onboarding.json")
 def onboarding():
     origin = current_app.config["PARTNER_ORIGIN"]
-    return jsonify(
+    flow = request.args.get("flow", "joint")
+    if flow not in {"a", "b", "joint"}:
+        raise ProtocolError("invalid_onboarding_flow")
+    form = dict(
         spec="musecat-partner-onboarding/v1",
         partner_id=current_app.config["PARTNER_ID"],
         display_name={
@@ -130,6 +141,11 @@ def onboarding():
             "key_rotation_window_hours": 24,
         },
     )
+    if flow != "joint":
+        form.pop("joint")
+    if flow == "a":
+        form.pop("direction_b")
+    return jsonify(form)
 
 
 @bp.post("/testing/expire-access")
