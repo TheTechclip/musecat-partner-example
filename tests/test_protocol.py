@@ -52,6 +52,63 @@ class ProtocolTests(unittest.TestCase):
             + base64.b64encode(("musecat:" + "s" * 43).encode()).decode()
         }
 
+    def test_language_selection_and_session_lifecycle(self):
+        from partner.i18n import LANGUAGES, MESSAGES
+        from string import Formatter
+
+        for translations in MESSAGES.values():
+            self.assertEqual(set(translations), set(LANGUAGES))
+            placeholders = [
+                {field for _, field, _, _ in Formatter().parse(value) if field}
+                for value in translations.values()
+            ]
+            self.assertTrue(all(fields == placeholders[0] for fields in placeholders))
+        for locale in LANGUAGES:
+            anonymous = self.app.test_client()
+            page = anonymous.get(
+                "/login", base_url=ORIGIN, headers={"Accept-Language": locale}
+            ).text
+            self.assertIn('lang="' + locale + '"', page)
+            response = self.post(
+                "/language",
+                form={"csrf": self.csrf(), "locale": locale, "next": "/login"},
+            )
+            self.assertEqual(response.status_code, 302)
+            self.login(self.http)
+            self.assertIn(
+                'lang="' + locale + '"', self.http.get("/", base_url=ORIGIN).text
+            )
+            self.post("/logout", form={"csrf": self.csrf()})
+            self.assertIn(
+                'lang="' + locale + '"', self.http.get("/login", base_url=ORIGIN).text
+            )
+
+    def test_language_redirect_validation_and_consent_locale(self):
+        for target in [
+            "https://evil.example/",
+            "//evil.example/",
+            "/disconnect",
+            "/#fragment",
+        ]:
+            response = self.post(
+                "/language", form={"csrf": self.csrf(), "locale": "ja", "next": target}
+            )
+            self.assertEqual(response.status_code, 400)
+        self.assertEqual(self.post("/language", form={"locale": "ja"}).status_code, 403)
+        self.assertEqual(
+            self.post(
+                "/language", form={"csrf": self.csrf(), "locale": "xx"}
+            ).status_code,
+            400,
+        )
+        target = "/oauth/authorize?state=example&code_challenge=public"
+        response = self.post(
+            "/language", form={"csrf": self.csrf(), "locale": "ja", "next": target}
+        )
+        self.assertEqual(response.location, target)
+        response = self.post("/connect/joint", form={"csrf": self.csrf()})
+        self.assertIn("/ja/connect/example_test?", response.location)
+
     def tearDown(self):
         self.directory.cleanup()
 

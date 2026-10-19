@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from urllib.parse import urlencode
 
-from flask import Blueprint, current_app, jsonify, redirect, request, session
+from flask import Blueprint, g, current_app, jsonify, redirect, request, session
 
 from .common import (
     MANIFEST,
@@ -88,7 +88,9 @@ def start_intent(correlation, return_to, completion=None):
 @bp.post("/connect/joint")
 def partner_start():
     require_csrf()
-    return start_intent(str(uuid.uuid4()), consent_url())
+    return start_intent(
+        str(uuid.uuid4()), consent_url("kr" if g.locale == "ko" else g.locale)
+    )
 
 
 @bp.get("/connect/musecat/start")

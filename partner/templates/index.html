@@ -1,33 +1,34 @@
 <!doctype html>
-<html lang="ko">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Musecat Partner Example</title><link rel="stylesheet" href="/static/style.css"></head>
+<html lang="{{ locale }}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ t('title') }} · Musecat Partner Example</title><link rel="stylesheet" href="/static/style.css"></head>
 <body><main>
+  <form class="language" action="/language" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}"><label for="locale">{{ t('language') }}</label><select id="locale" name="locale">{% for code, name in languages.items() %}<option value="{{ code }}" {% if code == locale %}selected{% endif %}>{{ name }}</option>{% endfor %}</select><button class="secondary">{{ t('apply') }}</button></form>
   <p class="eyebrow">MUSECAT · DEVELOPER SAMPLE</p>
-  <h1>외부 서비스 연결 예제</h1>
-  <p class="muted">로컬 Docker Compose ↔ Musecat Preview · 모든 게임 전적은 가상 데이터입니다.</p>
+  <h1>{{ t('title') }}</h1>
+  <p class="muted">{{ t('subtitle') }}</p>
   {% if mode == 'login' %}
-  <section><h2>데모 계정 로그인</h2><p>계정은 alice 또는 bob, 비밀번호는 프로젝트의 .env에 설정한 DEMO_PASSWORD입니다.</p>
-    <form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><label>계정<select name="username"><option>alice</option><option>bob</option></select></label><label>비밀번호<input type="password" name="password" required autocomplete="current-password"></label><button>로그인</button></form>
+  <section><h2>{{ t('demo_login') }}</h2><p>{{ t('login_hint') }}</p>
+    <form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><label>{{ t('account') }}<select name="username"><option>alice</option><option>bob</option></select></label><label>{{ t('password') }}<input type="password" name="password" required autocomplete="current-password"></label><button>{{ t('sign_in') }}</button></form>
   </section>
   {% elif mode == 'authorize' %}
-  <section><h2>Musecat에 데모 전적을 연결할까요?</h2><p>이 샘플 계정의 프로필{% if 'chunithm:read' in scopes %}과 가상 CHUNITHM 전적{% endif %}을 Musecat에 제공합니다.</p>
-    <form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">{% for key,value in fields.items() %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}<div class="actions"><button name="decision" value="approve">동의하고 연결</button><button class="secondary" name="decision" value="deny">취소</button></div></form>
+  <section><h2>{{ t('authorize_title') }}</h2><p>{{ t('authorize_records' if 'chunithm:read' in scopes else 'authorize_profile') }}</p>
+    <form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">{% for key,value in fields.items() %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}<div class="actions"><button name="decision" value="approve">{{ t('approve') }}</button><button class="secondary" name="decision" value="deny">{{ t('cancel') }}</button></div></form>
   </section>
   {% else %}
-  {% if not user %}<section><h2>시작하기</h2><p>데모 계정으로 로그인해 연결을 테스트하세요.</p><a class="button" href="/login">데모 로그인</a></section>
+  {% if not user %}<section><h2>{{ t('get_started') }}</h2><p>{{ t('get_started_hint') }}</p><a class="button" href="/login">{{ t('open_login') }}</a></section>
   {% else %}
-  <section><div class="heading"><h2>Demo {{ user|title }}</h2><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">로그아웃</button></form></div>
-    {% if link %}<p class="status">{{ '부분 연결 · 완료되지 않음' if link.partial else '연결됨' }}</p><p>Musecat: {{ link.name }}</p><p class="muted">{{ link.sub }}</p>
-      <div class="actions"><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if link.partial %}disabled{% endif %}>뮤즈캣 프로필 조회</button></form><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="refresh" value="yes"><button class="secondary" {% if link.partial %}disabled{% endif %}>토큰 갱신 후 조회</button></form><form action="/disconnect" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ '양쪽 연결 해제' if link.pair_id else '연결 해제' }}</button></form></div>
-    {% else %}<p>연결되지 않았습니다.</p>{% if not ready %}<p class="notice">먼저 Musecat 개발자 센터에서 앱을 승인받고 .env의 Musecat 발급 키를 설정하세요.</p>{% endif %}
-      <div class="actions"><form action="/connect/joint" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if not ready %}disabled{% endif %}>원클릭 양방향 연결</button></form><form action="/connect/musecat" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary" {% if not ready %}disabled{% endif %}>일반 OAuth 연결만</button></form></div>
+  <section><div class="heading"><h2>{{ t('demo_name', name=user|title) }}</h2><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form></div>
+    {% if link %}<p class="status">{{ t('partial' if link.partial else 'connected') }}</p><p>Musecat: {{ link.name }}</p><p class="muted">{{ link.sub }}</p>
+      <div class="actions"><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if link.partial %}disabled{% endif %}>{{ t('profile') }}</button></form><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="refresh" value="yes"><button class="secondary" {% if link.partial %}disabled{% endif %}>{{ t('refresh_profile') }}</button></form><form action="/disconnect" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('disconnect_joint' if link.pair_id else 'disconnect') }}</button></form></div>
+    {% else %}<p>{{ t('not_connected') }}</p>{% if not ready %}<p class="notice">{{ t('setup_hint') }}</p>{% endif %}
+      <div class="actions"><form action="/connect/joint" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if not ready %}disabled{% endif %}>{{ t('connect_joint') }}</button></form><form action="/connect/musecat" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary" {% if not ready %}disabled{% endif %}>{{ t('connect_oauth') }}</button></form></div>
     {% endif %}
-    {% if pending %}<p class="notice">해제 알림 {{ pending }}건 전송 대기 중 · 로컬 접근은 이미 차단됐습니다.</p>{% endif %}
+    {% if pending %}<p class="notice">{{ t('pending', count=pending) }}</p>{% endif %}
   </section>
-  <section><h2>샘플 CHUNITHM 전적</h2><div class="stats"><div><span>가상 레이팅</span><strong>16.42</strong></div><div><span>가상 플레이</span><strong>123</strong></div></div><p>파트너 공개 상태: {{ '비공개' if private else '공개' }}</p><form action="/records/privacy" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="private" value="{{ 'no' if private else 'yes' }}"><button class="secondary">{{ '공개로 변경' if private else '비공개로 변경' }}</button></form></section>
-  <section><h2>토큰 갱신 테스트</h2><p>이 데모 계정에 발급한 전적 API access token만 만료시킵니다. 이후 Musecat에서 전적을 새로고침하면 refresh token으로 복구해야 합니다. 전적 새로고침은 분당 1회로 제한됩니다.</p><form action="/testing/expire-access" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">데모 access token 만료</button></form></section>
+  <section><h2>{{ t('records') }}</h2><div class="stats"><div><span>{{ t('rating') }}</span><strong>16.42</strong></div><div><span>{{ t('plays') }}</span><strong>123</strong></div></div><p>{{ t('visibility', visibility=t('private' if private else 'public')) }}</p><form action="/records/privacy" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="private" value="{{ 'no' if private else 'yes' }}"><button class="secondary">{{ t('make_public' if private else 'make_private') }}</button></form></section>
+  <section><h2>{{ t('refresh_test') }}</h2><p>{{ t('refresh_hint') }}</p><form action="/testing/expire-access" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('expire') }}</button></form></section>
   {% endif %}
-  <section><h2>등록과 테스트</h2><p>이 서버의 실제 URL을 채운 등록 양식을 제공합니다. Client Secret과 서버 간 키는 이 양식에 포함하지 않습니다.</p><div class="actions"><a href="/onboarding.json">앱 등록 JSON</a><a href="https://preview.musecat.app/kr/developer" rel="noreferrer">Musecat 개발자 센터</a><a href="https://preview.musecat.app/api/developer/spec" rel="noreferrer">연동 스펙</a><a href="https://preview.musecat.app/kr/settings/connections" rel="noreferrer">Musecat에서 연결 시작</a></div></section>
+  <section><h2>{{ t('registration') }}</h2><p>{{ t('registration_hint') }}</p><div class="actions"><a href="/onboarding.json">{{ t('onboarding') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/developer" rel="noreferrer">{{ t('developer_center') }}</a><a href="{{ musecat_web }}/api/developer/spec" rel="noreferrer">{{ t('spec') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/settings/connections" rel="noreferrer">{{ t('start_musecat') }}</a></div></section>
   {% endif %}
   <footer>Python + Flask + SQLite · Musecat Partner Example</footer>
 </main></body></html>

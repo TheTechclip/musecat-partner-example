@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request
 
 from .common import ProtocolError, csrf
 from .storage import Ledger
+from .i18n import init_i18n
 
 
 def create_app(overrides=None):
@@ -80,8 +81,14 @@ def create_app(overrides=None):
         str(Path(app.config["DATA_DIR"]) / "sample.db"), app.config["DATA_KEY"]
     )
     app.context_processor(
-        lambda: {"csrf": csrf, "origin": app.config["PARTNER_ORIGIN"]}
+        lambda: {
+            "csrf": csrf,
+            "origin": app.config["PARTNER_ORIGIN"],
+            "musecat_web": app.config["MUSECAT_WEB_ORIGIN"],
+        }
     )
+
+    init_i18n(app)
 
     @app.errorhandler(ProtocolError)
     def error(exc):

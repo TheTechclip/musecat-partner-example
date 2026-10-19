@@ -1,7 +1,9 @@
 import hmac
+from urllib.parse import urlsplit
 
 from flask import (
     Blueprint,
+    g,
     current_app,
     jsonify,
     redirect,
@@ -21,6 +23,8 @@ from .common import (
     require_user,
     user,
 )
+
+from .i18n import LANGUAGES
 
 bp = Blueprint("web", __name__)
 
@@ -63,7 +67,7 @@ def login():
         session.clear()
         from .common import opaque
 
-        session.update(user=uid, sid=opaque())
+        session.update(user=uid, sid=opaque(), locale=g.locale)
         return redirect(target)
     return render_template("index.html", mode="login")
 
@@ -72,6 +76,7 @@ def login():
 def logout():
     require_csrf()
     session.clear()
+    session["locale"] = g.locale
     return redirect("/")
 
 
@@ -138,3 +143,21 @@ def expire_access():
             if grant and grant["user"] == uid:
                 ledger().delete(tx, "access", key)
     return redirect("/")
+
+
+@bp.post("/language")
+def language():
+    require_csrf()
+    selected = request.form.get("locale")
+    target = request.form.get("next", "/")
+    parsed = urlsplit(target)
+    if (
+        selected not in LANGUAGES
+        or parsed.scheme
+        or parsed.netloc
+        or parsed.fragment
+        or parsed.path not in ("/", "/login", "/oauth/authorize")
+    ):
+        raise ProtocolError("invalid_request")
+    session["locale"] = selected
+    return redirect(target)
