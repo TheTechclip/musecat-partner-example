@@ -1,0 +1,24 @@
+{% set title = t('api_console') %}{% extends "base.html" %}
+{% block content %}
+<p>{{ t('api_intro') }}</p><p>{{ operations|list|length }} operations · <a href="/api-examples/openapi.json">{{ t('schema') }}</a></p>
+<section><form method="get" action="/api-examples"><label>{{ t('operation') }}<select name="operation">{% for operation in operations %}<option value="{{ operation.id }}" {% if selected and selected.id == operation.id %}selected{% endif %}>{{ operation.id }}</option>{% endfor %}</select></label>{% if selected and selected.request_content %}<label>Content-Type<select name="media">{% for media in selected.request_content %}<option {% if selected.media == media %}selected{% endif %}>{{ media }}</option>{% endfor %}</select></label>{% endif %}<button>{{ t('open') }}</button></form></section>
+{% if result %}<section><h2>{{ t('api_result') }} · HTTP {{ result.status }}</h2><details><summary>{{ t('raw_data') }}</summary><pre>{{ result|tojson(indent=2) }}</pre></details></section>{% endif %}
+{% if selected %}
+<section><h2>{{ selected.id }}</h2><p>{{ selected.summary }}</p><p>{{ selected.description }}</p><p>{{ t('scopes') }}: {{ selected.scopes|join(' ') or '—' }}</p>
+<form method="post" action="/api-examples/run" enctype="multipart/form-data">
+<input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="operation" value="{{ selected.id }}"><input type="hidden" name="media" value="{{ selected.media }}">
+<h3>{{ t('parameters') }}</h3>
+{% for param in selected.parameters %}<label>{{ param.name }} ({{ param['in'] }}) {% if param.required %}*{% endif %}<input name="param:{{ param.name }}" placeholder="{{ param.schema.get('default', '') }}" {% if param.required %}required{% endif %}></label><p class="muted">{{ param.description or '' }}</p>{% endfor %}
+{% if selected.media %}<label>{{ t('request_body') }} · {{ selected.media }}<textarea name="body" rows="16">{{ selected.body_example|tojson(indent=2) }}</textarea></label>{% endif %}
+{% if selected.media == 'multipart/form-data' %}{% for key, property in resolve(selected.schema).get('properties', {}).items() %}{% if resolve(property).get('format') == 'binary' or resolve(resolve(property).get('items', {})).get('format') == 'binary' %}<label>{{ key }}<input type="file" name="{{ key }}" {% if resolve(property).get('type') == 'array' %}multiple{% endif %}></label>{% endif %}{% endfor %}{% endif %}
+{% if selected.runnable %}
+{% if selected.method not in ['GET','HEAD'] %}<p class="notice">{{ t('mutation_notice') }}</p><label>{{ selected.method }}<input name="confirm" autocomplete="off" required pattern="{{ selected.method }}"></label>{% endif %}
+<button>{{ t('run') }}</button>
+{% else %}<p class="notice">{{ t('reference_only') }}</p>{% endif %}
+</form>
+<h3>curl</h3><pre>{{ curl_example(selected) }}</pre>
+<details><summary>{{ t('responses') }} · JSON</summary><pre>{{ selected.response_examples|tojson(indent=2) }}</pre></details><details><summary>{{ t('responses') }} · OpenAPI</summary><pre>{{ selected.responses|tojson(indent=2) }}</pre></details>
+</section>
+{% endif %}
+
+{% endblock %}

@@ -165,6 +165,148 @@ MESSAGES = {
     },
 }
 
+MESSAGES.update(
+    {
+        "api_console": {
+            "en": "Developer API examples",
+            "ko": "개발자 API 예제",
+            "ja": "開発者 API サンプル",
+        },
+        "api_intro": {
+            "en": "Every operation in the bundled official OpenAPI is "
+            "listed. Tokens stay on this server.",
+            "ko": "공식 OpenAPI의 모든 작업을 제공합니다. 토큰은 서버에만 보관합니다.",
+            "ja": "同梱の公式 OpenAPI の全操作を掲載しています。トークンはサーバーに保管します。",
+        },
+        "operation": {"en": "Operation", "ko": "API 작업", "ja": "API 操作"},
+        "open": {"en": "Open example", "ko": "예제 열기", "ja": "サンプルを開く"},
+        "parameters": {"en": "Parameters", "ko": "파라미터", "ja": "パラメーター"},
+        "request_body": {
+            "en": "Request body (JSON fields for forms)",
+            "ko": "요청 본문 (폼도 JSON 필드로 입력)",
+            "ja": "リクエスト本文（フォームも JSON フィールドで入力）",
+        },
+        "run": {"en": "Execute request", "ko": "요청 실행", "ja": "リクエストを実行"},
+        "mutation_notice": {
+            "en": "This request changes data. Enter the HTTP method "
+            "below to explicitly confirm this one request.",
+            "ko": "데이터를 변경하는 요청입니다. 아래에 HTTP 메서드를 입력해야 이번 요청을 실행합니다.",
+            "ja": "データを変更する要求です。HTTP メソッドを下に入力して、この1回の実行を確認してください。",
+        },
+        "reference_only": {
+            "en": "Reference example: use the matching OAuth flow or a "
+            "first-party Musecat session. This playground does "
+            "not substitute credentials.",
+            "ko": "참고용 예제: 해당 OAuth 흐름 또는 뮤즈캣 로그인 세션을 사용해야 합니다. 콘솔에서 "
+            "다른 인증수단을 대신 사용하지 않습니다.",
+            "ja": "参照用サンプルです。対応する OAuth フローまたは Musecat "
+            "ログインセッションが必要です。この画面で別の認証に置き換えることはありません。",
+        },
+        "scopes": {"en": "Required scopes", "ko": "필요 권한", "ja": "必要なスコープ"},
+        "responses": {
+            "en": "Response contracts",
+            "ko": "응답 규격",
+            "ja": "レスポンス仕様",
+        },
+        "api_result": {
+            "en": "Actual API response",
+            "ko": "실제 API 응답",
+            "ja": "実際の API レスポンス",
+        },
+        "schema": {
+            "en": "Official OpenAPI snapshot",
+            "ko": "공식 OpenAPI 스냅샷",
+            "ja": "公式 OpenAPI スナップショット",
+        },
+        "back": {"en": "Back to demo", "ko": "데모로 돌아가기", "ja": "デモに戻る"},
+        "profile_details": {
+            "en": "Connected Musecat profile",
+            "ko": "연결한 뮤즈캣 프로필",
+            "ja": "連携した Musecat プロフィール",
+        },
+        "profile_notice": {
+            "en": "Read using your existing account:access consent and "
+            "Musecat domain permissions. Data is displayed only "
+            "in this demo session.",
+            "ko": "기존 account:access 동의와 뮤즈캣 도메인 권한으로 조회합니다. 이 데모 "
+            "세션에서만 표시합니다.",
+            "ja": "既存の account:access 同意と Musecat "
+            "の権限で取得します。このデモセッションだけに表示します。",
+        },
+        "games": {
+            "en": "Played games",
+            "ko": "플레이하는 게임",
+            "ja": "プレイするゲーム",
+        },
+        "favorites": {
+            "en": "Favorite arcades",
+            "ko": "즐겨찾는 오락실",
+            "ja": "お気に入りのゲームセンター",
+        },
+        "countries": {"en": "Countries", "ko": "국가", "ja": "国"},
+        "passport": {"en": "Passport", "ko": "패스포트", "ja": "パスポート"},
+        "stamps": {
+            "en": "Passport stamps (first page)",
+            "ko": "패스포트 스탬프 (첫 페이지)",
+            "ja": "パスポートのスタンプ（最初のページ）",
+        },
+        "activity": {"en": "Activity", "ko": "활동", "ja": "アクティビティ"},
+        "contributions": {
+            "en": "Contributions (first page)",
+            "ko": "기여 기록 (첫 페이지)",
+            "ja": "貢献履歴（最初のページ）",
+        },
+        "raw_data": {
+            "en": "Complete response JSON",
+            "ko": "전체 응답 JSON",
+            "ja": "完全なレスポンス JSON",
+        },
+        "no_items": {
+            "en": "No items returned",
+            "ko": "반환된 항목이 없습니다",
+            "ja": "返された項目はありません",
+        },
+        "profile_account": {
+            "en": "Profile and account details",
+            "ko": "프로필 및 계정 정보",
+            "ja": "プロフィールとアカウント情報",
+        },
+    }
+)
+
+MESSAGES.update(
+    {
+        "distinct_arcades": {
+            "en": "Distinct arcades",
+            "ja": "訪問したゲームセンター",
+            "ko": "방문한 오락실",
+        },
+        "distinct_cities": {
+            "en": "Visited cities",
+            "ja": "訪問した都市",
+            "ko": "방문한 도시",
+        },
+        "distinct_countries": {
+            "en": "Visited countries",
+            "ja": "訪問した国",
+            "ko": "방문한 국가",
+        },
+        "pagination": {
+            "en": "Page {page}/{last} · {total} items. Use API examples "
+            "for further pages.",
+            "ja": "{page}/{last} ページ・全 {total} 件。続きは API サンプルで取得できます。",
+            "ko": "{page}/{last} 페이지 · 총 {total}개. 다음 페이지는 API 예제에서 조회할 수 "
+            "있습니다.",
+        },
+        "total_visits": {
+            "en": "Total arcade visits",
+            "ja": "総訪問回数",
+            "ko": "총 오락실 방문",
+        },
+        "visit_days": {"en": "Visit days", "ja": "訪問した日数", "ko": "방문한 날"},
+    }
+)
+
 
 def init_i18n(app):
     @app.before_request

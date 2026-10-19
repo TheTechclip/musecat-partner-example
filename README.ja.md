@@ -17,7 +17,7 @@ Musecat Preview と連携する **開発・テスト用サンプル**です。Py
 | 開発者センター | <https://preview.musecat.app/ja/developer> |
 | 正式な連携仕様 | <https://preview.musecat.app/api/developer/spec> |
 
-この例は権限委譲 scope `account:access` を使用し、`/developer/v1/me` を呼び出します。ログイン専用の `openid profile arcade:read` を使う例とは別です。
+この例は権限委譲 scope `account:access` と `/developer/v1/account/*`、`/developer/v1/me` API を使用します。ログイン専用の `openid profile arcade:read` を使う例とは別です。
 
 ## 1. ローカル起動
 
@@ -157,3 +157,33 @@ docker compose config --quiet
 ## CHUNITHM 表示用の記録項目
 
 架空の応答には `rating`、`rating_max`、`over_power`、`played_chart_count`、`full_combo_count`、`all_justice_count`、`last_played_at`、`last_synced_at` を含めます。`rank_distribution` セクションは `rank` 列（型 `rank`）と `count` 列（型 `integer`）を提供します。Musecat はこれらの任意キーをレーティング・達成率・ランクの UI に変換できます。`played_chart_count` はプレイ済みの異なる譜面数で、プレイ回数ではありません。不明な値は0で埋めず省略します。通信仕様は引き続き `musecat-records/v1` であり、別の同期 API は作りません。出典には架空のデータであることを明示します。
+
+## 開発者 API の全サンプル
+
+デモログイン後、`/api-examples` の **開発者 API サンプル** を開きます。公式 Developer OpenAPI の **94パス・106操作** と、文書化された全リクエスト形式を掲載します。パラメーター・必要スコープ・編集可能な要求フィールド・生成した応答例・元の応答仕様・環境変数のプレースホルダーを使う curl コマンドを確認できます。スナップショットに認証情報やテストアカウントのデータは含みません。
+
+アカウント API は、現在の暗号化された連携とトークン更新処理を使ってサーバーから呼び出します。ブラウザーには応答だけを返し、access/refresh token は渡しません。エラーの HTTP ステータスと本文も表示し、ファイル送信では仕様の multipart フィールドを使います。変更要求は HTTP メソッドを入力して確認した場合だけ実行し、変更 API 全体を自動実行しません。
+
+OAuth・Musecat セッション用の9操作は参照例です。認可・同意には通常のブラウザーフロー、client 認証にはサーバー認証情報、承認管理には Musecat セッションが必要です。実際の A/B/共同連携は `partner/client.py`、`partner/oauth.py`、`partner/joint.py` に実装しています。OIDC は別途有効にしたアプリが必要で、`account:access` トークンの権限を暗黙に広げません。
+
+**Musecat プロフィールを取得** は既存のアカウント API を組み合わせ、完全なプロフィール（ゲーム・お気に入り・国・SNS・レベル・管理するゲームセンターなどの返却フィールド）、パスポート集計、スタンプの最初のページ、アクティビティ、貢献履歴の最初のページを取得します。続きのページやフィルターは API 画面から実行できます。所有者専用情報は認証済みデモセッションだけに表示し、公開する架空の記録にはコピーしません。フォームに `format=json` を加えると統合 JSON 応答を取得できます。
+
+```sh
+python examples/list_examples.py
+python examples/list_examples.py --operation 'GET /developer/v1/account/user/me'
+# 確認用の出力です。ファイル全体を一括実行しないでください。
+python examples/list_examples.py --all > /tmp/musecat-api-examples.sh
+```
+
+`partner/developer-openapi.json` は Backend Core `80568ba0cba2758a8f539207476d2b9e5fd93918` の公式仕様スナップショットで、`/api-examples/openapi.json` でも公開します。デプロイ先の仕様で更新するには以下を実行します。YAML 変換は開発作業で、実行環境の追加依存ではありません。
+
+```sh
+.venv/bin/pip install -r requirements-dev.txt
+curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
+.venv/bin/python scripts/update-api-schema.py /tmp/musecat-developer-openapi.yaml
+.venv/bin/python -m unittest discover -v
+```
+
+テストでは全操作・形式の網羅、固定 origin への送信、サーバー側のトークン管理、変更確認、HTTP エラー表示、プロフィール集約、取得中の解除を検証します。Musecat の既存検証・役割・公開範囲・GPS 条件・レート制限は引き続き適用されます。
+
+[開発者 API 検証結果](docs/developer-api-test-results.md)

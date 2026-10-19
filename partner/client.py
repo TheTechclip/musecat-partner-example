@@ -3,7 +3,15 @@
 import uuid
 from urllib.parse import urlencode
 
-from flask import Blueprint, current_app, jsonify, redirect, request, session
+from flask import (
+    Blueprint,
+    current_app,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+)
 
 from .common import (
     FAMILY,
@@ -232,9 +240,7 @@ def disconnect():
     return redirect("/")
 
 
-@bp.post("/musecat/profile")
-def profile():
-    require_csrf()
+def authorized_link(force_refresh=False):
     uid = require_user()
     # Claim the refresh before network I/O; concurrent refresh calls fail closed.
     with ledger().transaction() as tx:
@@ -243,7 +249,7 @@ def profile():
             raise ProtocolError("connection_required", 409)
         if not link["refresh"]:
             raise ProtocolError("refresh_in_progress_or_failed_reconnect", 409)
-        if link["access_expires"] <= now() or request.form.get("refresh") == "yes":
+        if link["access_expires"] <= now() or force_refresh:
             # Remove refresh from usable state before trying: ambiguous network failures require reconnect.
             refresh = link["refresh"]
             link["refresh"] = ""
@@ -276,4 +282,47 @@ def profile():
                 link = current
         if changed:
             raise ProtocolError("connection_changed", 409)
-    return jsonify(remote("GET", "/developer/v1/me", token=link["access"]))
+    return uid, link
+
+
+def verify_link(uid, link):
+    with ledger().transaction() as tx:
+        current = ledger().get(tx, "link", uid)
+        if not current or current["id"] != link["id"] or current.get("partial"):
+            raise ProtocolError("connection_changed", 409)
+
+
+@bp.post("/musecat/profile")
+def profile():
+    require_csrf()
+    uid, link = authorized_link(request.form.get("refresh") == "yes")
+    identity = remote("GET", "/developer/v1/me", token=link["access"])
+    if identity.get("sub") != link["sub"]:
+        raise ProtocolError("invalid_musecat_identity", 502)
+    account = remote("GET", "/developer/v1/account/user/me", token=link["access"])
+    if not isinstance(account.get("id"), str) or not account["id"]:
+        raise ProtocolError("invalid_musecat_profile", 502)
+    # Every read uses the same user-authorized account token and existing domain handlers.
+    user_id = account["id"]
+    data = {"identity": identity, "profile": account}
+    for name, path in {
+        "passport": "/user/passport?year=all",
+        "stamps": "/user/passport/stamps?year=all&page=1&per_page=24",
+        "activity": "/user/activity?"
+        + urlencode({"id": user_id, "days": 365, "tz": "UTC"}),
+        "contributions": "/user/changelog?"
+        + urlencode({"user": user_id, "page": 1, "per_page": 24}),
+    }.items():
+        try:
+            data[name] = {
+                "status": "ok",
+                "data": remote(
+                    "GET", "/developer/v1/account" + path, token=link["access"]
+                ),
+            }
+        except ProtocolError as error:
+            data[name] = {"status": "unavailable", "error": error.code}
+    verify_link(uid, link)
+    if request.form.get("format") == "json":
+        return jsonify(data)
+    return render_template("profile.html", data=data, profile=account)

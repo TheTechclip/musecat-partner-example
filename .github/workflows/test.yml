@@ -12,5 +12,6 @@ jobs:
           python-version: '3.13'
       - run: pip install -r requirements.txt
       - run: python -m unittest discover -v
+      - run: python examples/list_examples.py --all > /tmp/musecat-api-examples.sh && sh -n /tmp/musecat-api-examples.sh
       - run: python scripts/init-env.py && docker compose config --quiet
       - run: docker build -t musecat-partner-example:test .

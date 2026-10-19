@@ -12,6 +12,7 @@ from .i18n import init_i18n
 
 def create_app(overrides=None):
     app = Flask(__name__)
+    app.json.ensure_ascii = False
     names = [
         "PARTNER_ORIGIN",
         "PARTNER_ID",
@@ -111,10 +112,11 @@ def create_app(overrides=None):
         )
         return response
 
-    from . import oauth, joint, web, client
+    from . import oauth, joint, web, client, explorer
 
     app.register_blueprint(oauth.bp)
     app.register_blueprint(joint.bp)
     app.register_blueprint(web.bp)
     app.register_blueprint(client.bp)
+    app.register_blueprint(explorer.bp)
     return app

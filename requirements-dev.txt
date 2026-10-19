@@ -1,0 +1,2 @@
+# Only needed to refresh the official YAML schema snapshot.
+PyYAML==6.0.3

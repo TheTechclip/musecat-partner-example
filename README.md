@@ -17,7 +17,7 @@ A runnable **development and testing sample** for Musecat Preview. Python + Flas
 | Developer Center | <https://preview.musecat.app/en/developer> |
 | Authoritative integration specification | <https://preview.musecat.app/api/developer/spec> |
 
-This example uses the delegation scope `account:access` and calls `/developer/v1/me`. It does not demonstrate the separate sign-in scopes `openid profile arcade:read`.
+This example uses the delegation scope `account:access` and the documented `/developer/v1/account/*` APIs as well as `/developer/v1/me`. It does not demonstrate the separate sign-in scopes `openid profile arcade:read`.
 
 ## 1. Run locally
 
@@ -157,3 +157,33 @@ The Musecat specification above is authoritative. Dependency information: [Flask
 ## CHUNITHM presentation fields
 
 The synthetic response includes `rating`, `rating_max`, `over_power`, `played_chart_count`, `full_combo_count`, `all_justice_count`, `last_played_at`, and `last_synced_at`. The `rank_distribution` section has a `rank` column (type `rank`) and `count` column (type `integer`). Musecat can map these optional keys to its CHUNITHM rating, achievement, and rank UI. `played_chart_count` counts distinct charts; it is not a play count. Unknown values should be omitted, not filled with zero. The transport remains `musecat-records/v1`; these keys do not create another synchronization API. The source remains explicitly synthetic.
+
+## Complete Developer API examples
+
+After demo sign-in, open **Developer API examples** at `/api-examples`. The bundled official Developer OpenAPI contains **106 operations across 94 paths**, including all documented request content types. Each entry includes parameters, required scopes, editable request fields, generated response examples, the original response contract, and a curl command with environment-variable placeholders. The snapshot contains no application credentials or test-account data.
+
+Account API calls execute server-side using the current encrypted connection, including refresh rotation. The browser receives the API result, never the access/refresh token. The console displays non-2xx status and error bodies. File upload operations support their documented multipart fields. Changing requests require typing that request's HTTP method before execution; the sample never automatically runs the mutation catalog.
+
+The nine OAuth/first-party-session operations are reference examples rather than generic token-proxy actions: authorization and consent need their normal browser flow, client authentication needs confidential credentials, and authorization management needs a Musecat session. Existing `partner/client.py`, `partner/oauth.py`, and `partner/joint.py` implement the actual A/B/joint flows. OIDC scopes require a separately enabled application; an `account:access` token is not silently upgraded.
+
+**Read Musecat profile** now composes the existing account APIs for the full profile (games, favorites, countries, SNS, level, owned arcades and other returned fields), passport aggregates, the first stamp page, activity, and the first contribution page. Subsequent pages and filters can be exercised in the API console. Private owner data stays in this authenticated demo session and is not copied into public synthetic records. Append form field `format=json` for the combined JSON response.
+
+```sh
+python examples/list_examples.py
+python examples/list_examples.py --operation 'GET /developer/v1/account/user/me'
+# Print all examples for review; do not execute the resulting file as a batch.
+python examples/list_examples.py --all > /tmp/musecat-api-examples.sh
+```
+
+`partner/developer-openapi.json` is the official contract snapshot from Backend Core revision `80568ba0cba2758a8f539207476d2b9e5fd93918`. It is served at `/api-examples/openapi.json`. To update it from the deployment (YAML conversion is a development task, not a runtime dependency):
+
+```sh
+.venv/bin/pip install -r requirements-dev.txt
+curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
+.venv/bin/python scripts/update-api-schema.py /tmp/musecat-developer-openapi.yaml
+.venv/bin/python -m unittest discover -v
+```
+
+Tests verify complete operation/media coverage, fixed-origin request routing, server-side token handling, write confirmation, HTTP error display, full-profile composition, and disconnect races. Standard domain validation, roles, visibility, GPS requirements and rate limits still apply on Musecat.
+
+[Developer API verification](docs/developer-api-test-results.md)

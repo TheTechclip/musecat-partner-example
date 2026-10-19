@@ -25,7 +25,7 @@ with Docker Compose and optional Caddy HTTPS. MIT licensed.
 | 웹 / 개발자 센터 | <https://preview.musecat.app/kr/developer> |
 | 최신 연동 계약 | <https://preview.musecat.app/api/developer/spec> |
 
-샘플은 일반 기능 위임 scope `account:access`를 사용하고 `/developer/v1/me`만 호출합니다.
+샘플은 일반 기능 위임 scope `account:access`와 `/developer/v1/account/*`, `/developer/v1/me` API를 사용합니다.
 `openid profile arcade:read` 로그인 전용 예제와는 구분됩니다.
 
 ## 1. 로컬 실행 준비
@@ -184,3 +184,33 @@ CI에서도 테스트와 Compose 검증 및 Docker 빌드를 실행합니다.
 ## 츄니즘 화면용 전적 항목
 
 가상 응답에는 `rating`, `rating_max`, `over_power`, `played_chart_count`, `full_combo_count`, `all_justice_count`, `last_played_at`, `last_synced_at`이 들어 있습니다. `rank_distribution` 섹션은 `rank` 열(타입 `rank`)과 `count` 열(타입 `integer`)을 제공합니다. Musecat은 이 선택적 키를 츄니즘 레이팅·달성률·랭크 UI로 변환할 수 있습니다. `played_chart_count`는 서로 다른 플레이한 보면 수이며 플레이 횟수가 아닙니다. 알 수 없는 값은 0으로 채우지 않고 생략합니다. 전송 규격은 계속 `musecat-records/v1`이며 별도의 싱크 API를 만들지 않습니다. 출처에는 가상 데이터임을 명시합니다.
+
+## 개발자 API 전체 예제
+
+데모 로그인 후 `/api-examples`의 **개발자 API 예제**를 엽니다. 공식 Developer OpenAPI의 **94개 경로·106개 작업**과 문서에 정의된 모든 요청 형식을 제공합니다. 각 항목에서 파라미터·필요 권한·수정 가능한 요청 필드·생성된 응답 예제·원본 응답 규격·환경변수 자리표시자를 사용하는 curl 명령을 확인합니다. 스냅샷에는 앱 인증정보나 테스트 계정 데이터가 없습니다.
+
+계정 API는 현재 암호화된 연결과 토큰 회전 로직을 사용해 서버에서 호출합니다. 브라우저에는 응답만 전달하고 access/refresh token을 보내지 않습니다. 오류 HTTP 상태와 응답 본문도 표시하며, 파일 업로드는 명세의 multipart 필드를 지원합니다. 변경 요청은 해당 HTTP 메서드를 직접 입력해야 실행되고 전체 변경 API를 자동으로 실행하지 않습니다.
+
+OAuth·뮤즈캣 로그인 세션용 9개 작업은 참고 예제로 제공합니다. 인가·동의는 정상 브라우저 흐름, 클라이언트 인증은 서버 인증정보, 승인 관리는 뮤즈캣 세션을 사용해야 합니다. 실제 A/B/공동 연결 흐름은 `partner/client.py`, `partner/oauth.py`, `partner/joint.py`에 있습니다. OIDC 권한은 별도로 활성화된 앱이 필요하며 `account:access` 토큰의 권한을 임의로 확대하지 않습니다.
+
+**뮤즈캣 프로필 조회**는 기존 계정 API로 전체 프로필(게임·즐겨찾기·국가·SNS·레벨·관리 오락실 등 반환되는 필드), 패스포트 집계, 스탬프 첫 페이지, 활동, 기여 기록 첫 페이지를 함께 읽습니다. 다음 페이지와 필터는 API 콘솔에서 실행합니다. 소유자 전용 정보는 인증된 데모 세션에서만 표시하고 공개 가상 전적에 복사하지 않습니다. 폼 필드 `format=json`을 추가하면 종합 JSON 응답을 받습니다.
+
+```sh
+python examples/list_examples.py
+python examples/list_examples.py --operation 'GET /developer/v1/account/user/me'
+# 검토용 출력입니다. 파일 전체를 일괄 실행하지 마세요.
+python examples/list_examples.py --all > /tmp/musecat-api-examples.sh
+```
+
+`partner/developer-openapi.json`은 Backend Core `80568ba0cba2758a8f539207476d2b9e5fd93918`의 공식 계약 스냅샷이며 `/api-examples/openapi.json`에서도 제공합니다. 배포 명세로 갱신하려면 다음을 실행합니다. YAML 변환은 개발 작업이며 실행 서버의 추가 의존성이 아닙니다.
+
+```sh
+.venv/bin/pip install -r requirements-dev.txt
+curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
+.venv/bin/python scripts/update-api-schema.py /tmp/musecat-developer-openapi.yaml
+.venv/bin/python -m unittest discover -v
+```
+
+테스트는 전체 작업·요청 형식 포함 여부, 고정 origin 호출, 서버 토큰 처리, 변경 확인, HTTP 오류 표시, 전체 프로필 구성, 조회 중 연결 해제를 검증합니다. 뮤즈캣의 기존 검증·역할·공개 범위·GPS 조건·호출 제한도 그대로 적용됩니다.
+
+[개발자 API 검증 결과](docs/developer-api-test-results.md)

@@ -1,0 +1,18 @@
+{% set title = t('profile_details') %}{% extends "base.html" %}
+{% block content %}
+<p>{{ t('profile_notice') }}</p>
+<section><h2>{{ profile.nickname or profile.username }}</h2><p>{{ profile.bio or '' }}</p><p>@{{ profile.username }} · Lv.{{ profile.level }}</p><h3>{{ t('countries') }}</h3><p>{{ profile.countries|join(' · ') or '—' }}</p>
+<h3>{{ t('games') }}</h3><ul>{% for game in profile.series or [] %}<li>{{ game.get({'ko':'kr','ja':'jp'}.get(locale, 'en')) or game.en or game.id }}</li>{% else %}<li>{{ t('no_items') }}</li>{% endfor %}</ul>
+<h3>{{ t('favorites') }}</h3><ul>{% for arcade in profile.favorite_arcades or [] %}<li>{{ arcade.name }} · {{ arcade.country }} · {{ arcade.address }}</li>{% else %}<li>{{ t('no_items') }}</li>{% endfor %}</ul>
+<details><summary>{{ t('profile_account') }} · JSON</summary><pre>{{ profile|tojson(indent=2) }}</pre></details></section>
+{% for key in ['passport','stamps','activity','contributions'] %}
+<section><h2>{{ t(key) }}</h2>{% if data[key].status == 'ok' %}
+{% set payload = data[key].data %}
+{% if key == 'passport' %}<div class="stats">{% for metric in ['total_visits','distinct_arcades','distinct_countries','distinct_cities','visit_days'] %}<div><span>{{ t(metric) }}</span><strong>{{ payload.get(metric, '—') }}</strong></div>{% endfor %}</div>
+{% elif key == 'stamps' or key == 'contributions' %}<ul>{% for item in payload.get('items', []) %}<li>{{ item.get('name') or item.get('arcade_name') }} · {{ item.get('visit_count', item.get('changed', '')) }}</li>{% endfor %}</ul><p class="muted">{{ t('pagination', page=payload.get('page', 1), last=payload.get('last_page', 1), total=payload.get('total', 0)) }}</p>
+{% elif key == 'activity' %}<div class="stats">{% for metric, value in payload.get('totals', {}).items() %}<div><span>{{ metric }}</span><strong>{{ value }}</strong></div>{% endfor %}</div>{% endif %}
+<details><summary>{{ t('raw_data') }}</summary><pre>{{ payload|tojson(indent=2) }}</pre></details>
+{% else %}<p>{{ data[key].error }}</p>{% endif %}</section>
+{% endfor %}
+<section><details><summary>{{ t('raw_data') }}</summary><pre>{{ data|tojson(indent=2) }}</pre></details></section>
+{% endblock %}
