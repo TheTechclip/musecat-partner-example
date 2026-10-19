@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card">
+<h2>{{ labels[1] }}</h2><p>{{ advice[0] }}</p>
+<h2>{{ labels[2] }}</h2><p>{{ advice[1] }}</p>
+<p>{{ labels[4] }}: <code>{{ error_code }}</code></p>
+{% if retry_after %}<p>{{ labels[5] }}: {{ retry_after }}</p>{% endif %}
+<p><a class="button" href="/">{{ labels[3] }}</a></p>
+</section>
+{% endblock %}

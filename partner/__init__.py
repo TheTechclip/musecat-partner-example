@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from flask import Flask, jsonify, request
+from flask import Flask, request
 
 from .common import ProtocolError, csrf
 from .storage import Ledger
@@ -21,6 +21,8 @@ def create_app(overrides=None):
         "MUSECAT_TO_PARTNER_KEY",
         "PARTNER_TO_MUSECAT_KEY",
         "MUSECAT_CLIENT_SECRET",
+        "MUSECAT_LOGIN_CLIENT_ID",
+        "MUSECAT_LOGIN_CLIENT_SECRET",
         "DEMO_PASSWORD",
         "SESSION_SECRET",
         "DATA_KEY",
@@ -93,7 +95,9 @@ def create_app(overrides=None):
 
     @app.errorhandler(ProtocolError)
     def error(exc):
-        return jsonify(error=exc.code), exc.status
+        from .recovery import error_response
+
+        return error_response(exc)
 
     @app.after_request
     def headers(response):
@@ -101,7 +105,7 @@ def create_app(overrides=None):
             {
                 "Cache-Control": "no-store",
                 "Referrer-Policy": "no-referrer"
-                if request.path == "/oauth/musecat/callback"
+                if request.path in {"/oauth/musecat/callback", "/oidc/callback"}
                 else "same-origin",
                 "X-Content-Type-Options": "nosniff",
                 "Content-Security-Policy": "default-src 'self'; style-src 'self'; frame-ancestors 'none'; form-action 'self' "
@@ -112,11 +116,12 @@ def create_app(overrides=None):
         )
         return response
 
-    from . import oauth, joint, web, client, explorer
+    from . import oauth, joint, web, client, explorer, oidc
 
     app.register_blueprint(oauth.bp)
     app.register_blueprint(joint.bp)
     app.register_blueprint(web.bp)
     app.register_blueprint(client.bp)
     app.register_blueprint(explorer.bp)
+    app.register_blueprint(oidc.bp)
     return app

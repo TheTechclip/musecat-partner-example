@@ -4,6 +4,7 @@ import json
 import re
 import secrets
 import time
+import socket
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -20,8 +21,9 @@ FAMILY = 30 * 24 * 3600
 
 
 class ProtocolError(Exception):
-    def __init__(self, code, status=400):
+    def __init__(self, code, status=400, retry_after=None):
         self.code, self.status = code, status
+        self.retry_after = retry_after
 
 
 def ledger():
@@ -145,7 +147,9 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def remote(method, path, body=None, token=None, form=False, joint=False):
+def remote(
+    method, path, body=None, token=None, form=False, joint=False, client_auth=None
+):
     """Only call the configured Musecat issuer; never follow redirects or log bodies."""
     url = current_app.config["MUSECAT_ISSUER"] + path
     headers = {"Accept": "application/json"}
@@ -162,8 +166,10 @@ def remote(method, path, body=None, token=None, form=False, joint=False):
     data = None
     if body is not None:
         if form:
-            cid = current_app.config["PARTNER_ID"]
-            secret = current_app.config["MUSECAT_CLIENT_SECRET"]
+            cid, secret = client_auth or (
+                current_app.config["PARTNER_ID"],
+                current_app.config["MUSECAT_CLIENT_SECRET"],
+            )
             if not secret:
                 raise ProtocolError("musecat_configuration_required", 503)
             basic = urllib.parse.quote_plus(cid) + ":" + urllib.parse.quote_plus(secret)
@@ -184,8 +190,14 @@ def remote(method, path, body=None, token=None, form=False, joint=False):
             if len(raw) > 262144:
                 raise ProtocolError("musecat_response_too_large", 502)
             return json.loads(raw) if raw else {}
-    except (urllib.error.URLError, ValueError):
-        raise ProtocolError("musecat_request_failed", 502) from None
+    except urllib.error.HTTPError as exc:
+        from .recovery import upstream_error
+
+        raise upstream_error(exc) from None
+    except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
+        raise ProtocolError("musecat_unavailable", 503) from None
+    except (ValueError, UnicodeError):
+        raise ProtocolError("invalid_musecat_response", 502) from None
 
 
 def revoke_local(tx, pair_id, generation):

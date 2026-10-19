@@ -28,6 +28,18 @@ def deliver(app):
                         "unknown_generation",
                     ]:
                         raise ProtocolError("invalid_revocation_response", 502)
+                elif job["kind"] == "oidc":
+                    cid = app.config.get("MUSECAT_LOGIN_CLIENT_ID")
+                    secret = app.config.get("MUSECAT_LOGIN_CLIENT_SECRET")
+                    if not secret or cid != job["client_id"]:
+                        raise ProtocolError("oidc_configuration_required", 503)
+                    remote(
+                        "POST",
+                        "/oauth/revoke",
+                        {"token": job["token"]},
+                        form=True,
+                        client_auth=(cid, secret),
+                    )
                 else:
                     remote("POST", "/oauth/revoke", {"token": job["token"]}, form=True)
                 with ledger().transaction() as tx:

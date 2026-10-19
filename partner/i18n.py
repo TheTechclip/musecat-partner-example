@@ -394,6 +394,52 @@ MESSAGES.update(
 )
 
 
+MESSAGES.update(
+    {
+        "oidc_title": {
+            "en": "Sign in with Musecat",
+            "ko": "뮤즈캣으로 로그인",
+            "ja": "Musecat でログイン",
+        },
+        "oidc_hint": {
+            "en": "Standalone OpenID Connect login with read-only profile and arcade scopes. It creates a separate local account identified by issuer + subject; demo accounts and linked grants are not merged.",
+            "ko": "읽기 전용 프로필·오락실 권한으로 OpenID Connect 로그인을 시험합니다. issuer와 subject로 별도 로컬 계정을 만들며, 데모 계정이나 기존 연결과 자동 병합하지 않습니다.",
+            "ja": "読み取り専用のプロフィール・店舗スコープで OpenID Connect ログインを試します。issuer と subject で別のローカルアカウントを識別し、デモアカウントや既存連携とは自動統合しません。",
+        },
+        "oidc_account": {
+            "en": "Signed in: {name}",
+            "ko": "로그인: {name}",
+            "ja": "ログイン中: {name}",
+        },
+        "oidc_expiry": {
+            "en": "The example session expires with its access/ID token (at most ten minutes). Sign in again after expiry. Sign-out queues token revocation.",
+            "ko": "예제 세션은 access/ID token과 함께 최대 10분 뒤 만료됩니다. 만료 후 다시 로그인하세요. 로그아웃하면 토큰 해제를 전송합니다.",
+            "ja": "サンプルのセッションは access/ID token とともに最大10分で失効します。期限後は再ログインしてください。ログアウト時にトークン解除を送信します。",
+        },
+        "oidc_setup": {
+            "en": "Register the login-only JSON as a separate app, enable login, obtain approval and set MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET.",
+            "ko": "로그인 전용 JSON으로 별도 앱을 등록하고 로그인 허용·승인을 받은 뒤 MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET을 설정하세요.",
+            "ja": "ログイン専用 JSON で別アプリを登録し、ログイン有効化・承認後に MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET を設定してください。",
+        },
+        "oidc_registration": {
+            "en": "Registration JSON · OIDC login only",
+            "ko": "등록 JSON · OIDC 로그인 전용",
+            "ja": "登録 JSON · OIDC ログイン専用",
+        },
+        "oidc_nearby": {
+            "en": "Read nearby arcades using login permission",
+            "ko": "로그인 권한으로 주변 오락실 조회",
+            "ja": "ログイン権限で周辺店舗を取得",
+        },
+        "oidc_location": {
+            "en": "Demo query around Seoul City Hall (37.5665, 126.978); the user's location is not requested.",
+            "ko": "서울시청 주변(37.5665, 126.978) 예제 조회입니다. 사용자 위치를 요청하지 않습니다。",
+            "ja": "ソウル市庁付近（37.5665, 126.978）のデモ検索です。ユーザーの現在地は要求しません。",
+        },
+    }
+)
+
+
 def init_i18n(app):
     @app.before_request
     def locale():

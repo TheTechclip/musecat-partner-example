@@ -1,0 +1,10 @@
+<section aria-labelledby="oidc-title"><h2 id="oidc-title">{{ t('oidc_title') }}</h2><p>{{ t('oidc_hint') }}</p>
+{% if g.oidc_login %}
+<p class="status">{{ t('oidc_account', name=g.oidc_login.name) }}</p><p>{{ t('oidc_expiry') }}</p>
+<form action="/oidc/nearby" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button>{{ t('oidc_nearby') }}</button></form>
+<form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form>
+{% else %}
+<form action="/oidc/login" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if not config.get('MUSECAT_LOGIN_CLIENT_SECRET') or not config.get('MUSECAT_LOGIN_CLIENT_ID') %}disabled{% endif %}>{{ t('oidc_title') }}</button></form>
+{% if not config.get('MUSECAT_LOGIN_CLIENT_SECRET') or not config.get('MUSECAT_LOGIN_CLIENT_ID') %}<p class="notice">{{ t('oidc_setup') }}</p>{% endif %}
+{% endif %}
+<p><a href="/onboarding.json?flow=login">{{ t('oidc_registration') }}</a></p></section>

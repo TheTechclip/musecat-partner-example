@@ -1,0 +1,24 @@
+{
+  "spec": "musecat-records/v1",
+  "service": "sdvx",
+  "sub": "sample:player",
+  "visibility": "public",
+  "updated_at": "2026-10-19T13:00:00Z",
+  "source": {"name": "Synthetic SOUND VOLTEX adapter example", "url": "https://partner.example"},
+  "fields": [
+    {"key": "volforce", "label": {"en": "VOLFORCE", "ko": "볼포스", "ja": "ボルフォース"}, "type": "decimal", "value": 20.125, "precision": 3},
+    {"key": "skill_level", "label": {"en": "Skill level", "ko": "스킬 레벨", "ja": "スキルレベル"}, "type": "string", "value": "INF"}
+  ],
+  "sections": [{
+    "key": "best_charts",
+    "label": {"en": "Best charts", "ko": "베스트 기록", "ja": "ベスト記録"},
+    "columns": [
+      {"key": "song", "label": {"en": "Song", "ko": "곡", "ja": "楽曲"}, "type": "string"},
+      {"key": "difficulty", "label": {"en": "Difficulty", "ko": "난이도", "ja": "難易度"}, "type": "string"},
+      {"key": "score", "label": {"en": "Score", "ko": "점수", "ja": "スコア"}, "type": "integer"},
+      {"key": "clear_lamp", "label": {"en": "Clear lamp", "ko": "클리어 램프", "ja": "クリアランプ"}, "type": "string"}
+    ],
+    "rows": [["Synthetic song", "EXH 17", 9980000, "EXCESSIVE COMPLETE"]],
+    "total": 1
+  }]
+}

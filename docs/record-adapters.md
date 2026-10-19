@@ -1,0 +1,11 @@
+# Adapting different games and providers
+
+The common transport is `musecat-records/v1`. A provider adapter converts its own source response into this envelope; Musecat does not automatically interpret a provider's arbitrary JSON or request private API keys from the browser. The `service` identifies the game (`chunithm`, `nostalgia`, `sdvx`, etc.); the provider identifies who supplies it.
+
+Each game can have different metric keys, labels, units and table columns. [The synthetic SDVX example](../examples/records-sdvx.json) uses `volforce`, `skill_level` and chart/score/lamp rows, without CHUNITHM rating or AJ fields. It illustrates conversion only: the running default provider still declares CHUNITHM. To serve another game, declare its approved service and scope and implement its record endpoint; do not claim another provider's source format matches this example.
+
+The server validates types, subject binding, game ID, HTTPS links and bounded size (24 fields, 4 sections, 50 rows per section, 8 columns and 256 KiB). `sub` must identify the OAuth-authenticated partner account and is stripped before profile responses. Both partner privacy and Musecat publication settings still apply. Percent values are on a 0–100 scale; dates/datetimes use the published ISO/RFC3339 contract. Use `null` for unknown values rather than inventing zeros. State units and aggregation windows clearly in labels or section names.
+
+The generic renderer shows these metrics and tables in the visitor's locale. CHUNITHM additionally has an optional rich vocabulary: `rating`, `rating_max`, `over_power`, `played_chart_count`, `full_combo_count`, `all_justice_count`, `last_played_at`, `last_synced_at`, and `rank_distribution` with `rank`/`count` columns. Missing or incompatible rich fields fall back to generic display; unconsumed valid fields remain visible. A partner's different key name will not silently acquire a CHUNITHM-specific meaning.
+
+There is currently no automatic cross-provider semantic equivalence, song/chart matching, unit conversion or dedicated SDVX/Nostalgia visual design. Providers using the same game's rich screen need to agree on that game's field meanings; the common envelope alone only standardizes transport, validation and generic presentation. Do not calculate or relabel another game's statistics as CHUNITHM metrics.

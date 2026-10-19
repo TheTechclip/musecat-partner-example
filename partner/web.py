@@ -55,6 +55,11 @@ def home():
         record_grants=record_grants,
         partner_id=current_app.config["PARTNER_ID"],
         a_ready=bool(current_app.config["MUSECAT_CLIENT_SECRET"]),
+        oidc_ready=bool(
+            current_app.config.get("MUSECAT_LOGIN_CLIENT_ID")
+            and current_app.config.get("MUSECAT_LOGIN_CLIENT_SECRET")
+        ),
+        oidc_login=getattr(g, "oidc_login", None),
         joint_ready=bool(
             current_app.config["MUSECAT_CLIENT_SECRET"]
             and current_app.config["PARTNER_TO_MUSECAT_KEY"]
@@ -72,6 +77,9 @@ def login():
         ):
             raise ProtocolError("invalid_credentials", 401)
         target = session.get("next", "/")
+        from .oidc import end_session
+
+        end_session()
         session.clear()
         from .common import opaque
 
@@ -83,6 +91,9 @@ def login():
 @bp.post("/logout")
 def logout():
     require_csrf()
+    from .oidc import end_session
+
+    end_session()
     session.clear()
     session["locale"] = g.locale
     return redirect("/")
@@ -104,7 +115,7 @@ def privacy():
 def onboarding():
     origin = current_app.config["PARTNER_ORIGIN"]
     flow = request.args.get("flow", "joint")
-    if flow not in {"a", "b", "joint"}:
+    if flow not in {"a", "b", "joint", "login"}:
         raise ProtocolError("invalid_onboarding_flow")
     form = dict(
         spec="musecat-partner-onboarding/v1",
@@ -143,8 +154,24 @@ def onboarding():
     )
     if flow != "joint":
         form.pop("joint")
-    if flow == "a":
+    if flow in {"a", "login"}:
         form.pop("direction_b")
+    if flow == "b":
+        form.pop("direction_a")
+    if flow == "login":
+        form["partner_id"] = (
+            current_app.config.get("MUSECAT_LOGIN_CLIENT_ID")
+            or current_app.config["PARTNER_ID"][:122] + "_login"
+        )
+        form["direction_a"] = {
+            "redirect_uris": [origin + "/oidc/callback"],
+            "login_enabled": True,
+        }
+        form["display_name"] = {
+            "en": "Musecat Login Example",
+            "ko": "뮤즈캣 로그인 예제",
+            "ja": "Musecat ログインサンプル",
+        }
     return jsonify(form)
 
 

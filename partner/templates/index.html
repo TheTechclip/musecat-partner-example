@@ -17,7 +17,7 @@
   {% else %}
   {% if not user %}<section><h2>{{ t('get_started') }}</h2><p>{{ t('get_started_hint') }}</p><a class="button" href="/login">{{ t('open_login') }}</a></section>
   {% else %}
-  <section><div class="heading"><h2>{{ t('demo_name', name=user|title) }}</h2><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form></div>
+  <section><div class="heading"><h2>{{ t('oidc_account', name=oidc_login.name) if oidc_login else t('demo_name', name=user|title) }}</h2><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form></div>
     {% if link %}<p class="status">{{ t('partial' if link.partial else 'connected') }}</p><p>{{ t('joint_mode' if link.pair_id else 'oneway_mode') }}</p><p>Musecat: {{ link.name }}</p><p class="muted">{{ link.sub }}</p>
       <div class="actions"><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button {% if link.partial %}disabled{% endif %}>{{ t('profile') }}</button></form><form action="/musecat/profile" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="refresh" value="yes"><button class="secondary" {% if link.partial %}disabled{% endif %}>{{ t('refresh_profile') }}</button></form><form action="/disconnect" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('disconnect_joint' if link.pair_id else 'disconnect') }}</button></form></div>
     {% else %}<p>{{ t('not_connected') }}</p>
@@ -45,5 +45,6 @@
   <section><h2>{{ t('registration') }}</h2><p>{{ t('registration_hint') }}</p><div class="actions"><a href="/onboarding.json">{{ t('onboarding') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/developer" rel="noreferrer">{{ t('developer_center') }}</a><a href="{{ musecat_web }}/api/developer/spec" rel="noreferrer">{{ t('spec') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/settings/connections" rel="noreferrer">{{ t('start_musecat') }}</a></div></section>
   {% endif %}
   <p><a class="button secondary" href="/api-examples">{{ t('api_console') }}</a></p>
+  {% if mode != 'authorize' %}{% include 'oidc-panel.html' %}{% endif %}
   <footer>Python + Flask + SQLite · Musecat Partner Example</footer>
 </main></body></html>

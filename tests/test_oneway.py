@@ -123,7 +123,7 @@ class OneWayTests(unittest.TestCase):
         for flow in ["a", "b", "joint"]:
             response = self.http.get("/onboarding.json?flow=" + flow, base_url=ORIGIN)
             self.assertEqual(response.status_code, 200)
-            self.assertIn("direction_a", response.json)
+            self.assertEqual("direction_a" in response.json, flow != "b")
             self.assertEqual("direction_b" in response.json, flow != "a")
             self.assertEqual("joint" in response.json, flow == "joint")
         self.assertEqual(
