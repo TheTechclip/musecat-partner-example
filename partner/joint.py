@@ -9,7 +9,6 @@ from flask import Blueprint, g, current_app, jsonify, redirect, request, session
 
 from .common import (
     MANIFEST,
-    SCOPES,
     ProtocolError,
     bearer_key,
     callback,
@@ -202,7 +201,11 @@ def receipts():
         except (ValueError, TypeError, KeyError, AttributeError):
             raise ProtocolError("invalid_request") from None
         grant = create_grant(
-            tx, intent["user"], SCOPES, intent["correlation_id"], body["generation"]
+            tx,
+            intent["user"],
+            ["profile", "chunithm:read"],
+            intent["correlation_id"],
+            body["generation"],
         )
         partner_code = issue_code(tx, grant, body["code_challenge"])
         intent.update(
@@ -219,7 +222,7 @@ def receipts():
         return {
             "partner_code": partner_code,
             "partner_code_expires_at": stamp(now() + 90),
-            "scope": " ".join(SCOPES),
+            "scope": "profile chunithm:read",
         }
 
     return execute(action)

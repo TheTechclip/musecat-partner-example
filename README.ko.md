@@ -1,6 +1,8 @@
 # Musecat Partner Example
 
 [English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md)
+유효한 앱 등록은 개발 모드에서 소유자와 지정 테스트 계정 최대 10명이 즉시 사용할 수 있습니다. 일반 사용자 대상 실서비스 전환에는 운영자 승인이 필요합니다. 자격증명과 사용자 동의는 두 모드 모두 필요합니다. B 전용 등록은 다섯 게임을 선언하며 기존 양방향 예제는 츄니즘 manifest를 유지합니다. [게임별 규격·최근 플레이·선택 항목·캐시 무효화](docs/record-adapters.md).
+
 
 A runnable OAuth/OIDC example for Musecat Preview: PKCE, synthetic
 CHUNITHM records, joint consent, standalone login, and bilateral revocation. Python + Flask + SQLite,
@@ -8,6 +10,8 @@ with Docker Compose and optional Caddy HTTPS. MIT licensed.
 
 뮤즈캣 외부 연동을 직접 구현해 보는 **개발·테스트용 샘플**입니다. `alice` / `bob` 두 데모
 계정과 가상 전적을 사용합니다. 실제 게임 계정 수집이나 상용 OAuth 서버 운영을 위한 제품은 아닙니다.
+
+[localhost 및 실제 preview 연결 실행 안내](docs/local-development.md)
 
 ## 확인할 수 있는 흐름
 
@@ -40,18 +44,18 @@ with Docker Compose and optional Caddy HTTPS. MIT licensed.
 | 뮤즈캣에서 예제 전적 조회 (B만) | 뮤즈캣 설정 → 일반 외부 계정 연결 → 예제의 CHUNITHM 선택 → 연결 | `/onboarding.json?flow=b` | 없음. 생성된 파트너 OAuth ID/시크릿을 뮤즈캣에 설정 |
 | 통합 동의로 양방향 연결 | 어느 서비스에서든 **원클릭 양방향 연결** | `/onboarding.json?flow=joint` (기본값) | `MUSECAT_CLIENT_SECRET`, `PARTNER_TO_MUSECAT_KEY`. 생성된 파트너 OAuth 정보와 `MUSECAT_TO_PARTNER_KEY`도 뮤즈캣에 전달 |
 
-모든 모드는 로컬 세션·암호화·데모 계정용 생성 값을 사용합니다. 사용하지 않는 모드의 생성 키는 `.env`에 두어도 되며 교환할 필요가 없습니다. 앱 승인과 정확한 콜백 등록은 공통입니다. **B 전용 앱을 등록할 수 있습니다.** `/onboarding.json?flow=b`는 `direction_a`를 완전히 생략합니다. 개발자 센터에서 A를 끄고 B만 선언하면 A 콜백·뮤즈캣 발급 A 시크릿·Joint 키가 필요하지 않습니다. 이미 전체 기능으로 승인된 앱은 등록 변경 없이 세 버튼을 독립적으로 시험할 수 있습니다. 모드를 바꿀 때마다 세 JSON을 번갈아 제출하지 마세요. 승인된 설정을 변경하면 기존 동의가 무효화될 수 있습니다.
+모든 모드는 로컬 세션·암호화·데모 계정용 생성 값을 사용합니다. 사용하지 않는 모드의 생성 키는 `.env`에 두어도 되며 교환할 필요가 없습니다. 앱 등록과 정확한 콜백 등록은 공통입니다. **B 전용 앱을 등록할 수 있습니다.** `/onboarding.json?flow=b`는 `direction_a`를 완전히 생략합니다. 개발자 센터에서 A를 끄고 B만 선언하면 A 콜백·뮤즈캣 발급 A 시크릿·Joint 키가 필요하지 않습니다. 이미 전체 기능으로 등록된 앱은 등록 변경 없이 세 버튼을 독립적으로 시험할 수 있습니다. 모드를 바꿀 때마다 세 JSON을 번갈아 제출하지 마세요. 등록된 설정을 변경하면 기존 동의가 무효화될 수 있습니다.
 
 A의 성공 기준은 예제에 **단방향 뮤즈캣 API 연결**이 표시되고 공개 프로필을 조회하는 것입니다. `account:access`에는 문서화된 일반 사용자 쓰기 기능도 포함되며 읽기 전용 scope나 OIDC 로그인이 아닙니다. B는 뮤즈캣에 계정이 연결되고 가상 전적을 조회하면 성공입니다. **프로필 공개는 별도로 켜고** 공개 프로필에서 확인하세요. 예제의 동의 건수는 토큰 교환을 마친 접근 권한이며, 뮤즈캣의 캐시·실제 프로필 표시 상태를 증명하지는 않습니다. B만 연결한 계정의 해제는 뮤즈캣 설정에서 합니다. A만 해제해도 별도로 만든 B 권한은 유지됩니다. 독립 동의 두 개가 자동으로 공동 연결이 되지는 않습니다.
 
-Alice의 데모를 유지하며 다른 모드를 시험하려면 `bob`을 사용하세요. 다만 뮤즈캣의 계정 중복 연결 규칙은 그대로 적용되므로 같은 뮤즈캣 계정을 충돌하는 데모 계정에 승인하지 마세요. 계정 변경은 기존 연결을 의도적으로 해제한 뒤 진행하세요. 별도의 **뮤즈캣으로 로그인**은 아래 절차로 구현되어 있습니다. Alice의 승인된 A/B/Joint 앱을 수정하지 말고 로그인 앱을 따로 등록하세요. 설정 변경 승인으로 기존 grant가 무효화될 수 있습니다.
+Alice의 데모를 유지하며 다른 모드를 시험하려면 `bob`을 사용하세요. 다만 뮤즈캣의 계정 중복 연결 규칙은 그대로 적용되므로 같은 뮤즈캣 계정을 충돌하는 데모 계정에 승인하지 마세요. 계정 변경은 기존 연결을 의도적으로 해제한 뒤 진행하세요. 별도의 **뮤즈캣으로 로그인**은 아래 절차로 구현되어 있습니다. Alice의 등록된 A/B/Joint 앱을 수정하지 말고 로그인 앱을 따로 등록하세요. 설정 변경 승인으로 기존 grant가 무효화될 수 있습니다.
 
 ### 첫 연결이 실패할 때
 
 | 증상 | 확인 및 복구 |
 | --- | --- |
-| A 버튼이 비활성화됨 | 승인된 앱의 Client Secret을 `MUSECAT_CLIENT_SECRET`에 설정. 양방향 키 교환은 불필요 |
-| 뮤즈캣에 제공자가 없음 | 개발자 센터의 앱 승인, 승인된 B 선언, 파트너 OAuth credential 확인 |
+| A 버튼이 비활성화됨 | 등록된 앱의 Client Secret을 `MUSECAT_CLIENT_SECRET`에 설정. 양방향 키 교환은 불필요 |
+| 뮤즈캣에 제공자가 없음 | 개발자 센터의 앱 등록, 등록된 B 선언, 파트너 OAuth credential 확인 |
 | `invalid_origin` | 정확한 HTTPS `PARTNER_ORIGIN`으로 접속. 터널 변경 시 origin·승인 URL을 바꾸고 컨테이너 재생성 |
 | `invalid_client` 또는 콜백 거부 | 키 발급 주체와 방향, 등록한 콜백의 정확한 일치 확인 |
 | `invalid_grant`·잘못된 state·만료 | 같은 브라우저 세션에서 새로 시작. 콜백·코드 재사용 금지. refresh 소모 후에는 재연결 |
@@ -90,7 +94,7 @@ docker compose ps
 ```
 
 **브라우저도 HTTPS 터널 주소로 접속**하세요. 쿠키는 Secure입니다. 터널 주소가 바뀌면
-issuer와 콜백도 바뀌므로 기존 앱에 URL을 변경·재승인하고 연결을 새로 만들어야 합니다.
+issuer와 콜백도 바뀌므로 기존 앱에 URL을 변경·등록 갱신하고 연결을 새로 만들어야 합니다.
 Quick Tunnel은 임시 테스트용입니다. 주소를 고정하려면 named tunnel이나 아래 방식을 사용하세요.
 
 ### 선택 B: 고정 도메인 + Caddy
@@ -115,7 +119,7 @@ docker compose --profile https up -d --build
 1. 샘플의 **앱 등록 JSON** (`/onboarding.json`)을 엽니다. 실제 URL과 생성된 `PARTNER_ID`가 들어 있습니다.
 2. 뮤즈캣 개발자 센터에서 선택한 흐름의 JSON으로 앱을 등록합니다. 기본 정보와 해당 JSON에 포함된 방향만 입력합니다.
    `contact_email`은 본인 연락처로 변경하세요.
-3. 등록 요청 후 뮤즈캣 운영자의 승인을 받습니다. 승인은 샘플에서 우회하지 않습니다.
+3. 유효한 등록은 개발 모드에서 즉시 사용할 수 있습니다. 소유자 외 계정은 테스트 사용자로 지정하세요. 일반 사용자 공개는 별도 승인이 필요합니다.
 4. 아래 자격증명을 교환합니다. 값은 **서버 전용**이며 GitHub 이슈·스크린샷·브라우저 JS에 넣지 않습니다.
 
 | 값 | 발급 주체 | 설정 위치 |
@@ -152,8 +156,8 @@ outbox를 읽을 수 없습니다. 샘플은 현재 연결을 먼저 해제한 �
 ## 2.1. 별도의 뮤즈캣으로 로그인 (OIDC)
 
 1. `python3 scripts/init-env.py`를 다시 실행해 기존 값을 유지하며 빠진 설정을 추가합니다. `MUSECAT_LOGIN_CLIENT_ID`의 기본값은 `PARTNER_ID + "_login"`이며 ID 길이 제한에 맞춰 앞부분을 자릅니다. 기존 A/B/Joint 앱과 자격증명은 유지합니다.
-2. `/onboarding.json?flow=login`으로 **별도 앱**을 개발자 센터에 등록합니다. 앱 ID는 `MUSECAT_LOGIN_CLIENT_ID`와 일치해야 합니다. A와 `direction_a.login_enabled: true`를 켜고 콜백을 정확히 `<PARTNER_ORIGIN>/oidc/callback`으로 등록합니다. 이 양식에는 B·Joint가 없습니다. 연락처 등을 실제 정보로 바꾸고 운영자 심사를 요청하세요.
-3. 승인 후 로그인 앱의 Client Secret을 발급받아 `.env`의 `MUSECAT_LOGIN_CLIENT_SECRET`에 입력하고 `docker compose up -d --build --force-recreate`로 재생성합니다. 기존 A/B/Joint 앱의 시크릿을 넣지 마세요.
+2. `/onboarding.json?flow=login`으로 **별도 앱**을 개발자 센터에 등록합니다. 앱 ID는 `MUSECAT_LOGIN_CLIENT_ID`와 일치해야 합니다. A와 `direction_a.login_enabled: true`를 켜고 콜백을 정확히 `<PARTNER_ORIGIN>/oidc/callback`으로 등록합니다. 이 양식에는 B·Joint가 없습니다. 연락처 등을 실제 정보로 바꾸고 등록을 저장하세요. 개발 테스트에는 운영자 심사가 필요하지 않습니다. 일반 공개에는 실서비스 심사를 요청하세요.
+3. 등록 후 로그인 앱의 Client Secret을 발급받아 `.env`의 `MUSECAT_LOGIN_CLIENT_SECRET`에 입력하고 `docker compose up -d --build --force-recreate`로 재생성합니다. 기존 A/B/Joint 앱의 시크릿을 넣지 마세요.
 4. 정확한 공개 HTTPS origin의 홈에서 **뮤즈캣으로 로그인**을 선택합니다. 데모 로그인이 필요하지 않습니다. 뮤즈캣에서 로그인하고 `openid profile arcade:read`에 동의하면 검증된 계정으로 로컬 세션을 만듭니다. 기존 데모 로그인 세션은 교체되지만 저장된 A/B/Joint grant를 합치거나 해제하지 않습니다.
 5. 로그인한 홈의 근처 오락실 조회(`POST /oidc/nearby`)를 실행합니다. 서울 중심 반경 5 km의 고정된 읽기 요청이며 기기 위치를 수집하거나 오락실 전체 목록을 내보내지 않습니다. 이 로그인으로 `account:access` API 콘솔이나 데모 전적 도구의 권한이 생기지는 않습니다.
 6. **로그아웃**(`POST /logout`)하면 로컬 접근을 즉시 끝내고 worker가 암호화된 영속 outbox로 토큰 회수를 재시도합니다. 뮤즈캣 전체 로그아웃이나 Alice의 별도 A/B/Joint 연결 해제는 아닙니다. 회수 대기가 끝날 때까지 worker를 실행하세요.
@@ -169,7 +173,7 @@ outbox를 읽을 수 없습니다. 샘플은 현재 연결을 먼저 해제한 �
 ## 3. 실제 테스트 순서
 
 테스트용 뮤즈캣 개발 계정을 사용합니다. 두 데모 계정은 동일한 데모 비밀번호를 공유하므로
-공개 배포에서는 승인된 테스트 참여자에게만 비밀번호를 전달하세요.
+공개 배포에서는 등록된 테스트 참여자에게만 비밀번호를 전달하세요.
 
 1. 샘플 로그인 → **일반 OAuth 연결만** → 뮤즈캣 동의 → 프로필 조회와 토큰 갱신 후 조회
 2. 연결 해제 → worker가 알림을 전송하고 뮤즈캣 설정에서도 승인 해제 확인

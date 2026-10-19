@@ -1,3 +1,5 @@
+> 현재 등록 정책: 유효한 개발 앱은 소유자와 지정 테스트 계정 10명까지 즉시 사용할 수 있습니다. 일반 사용자에게 공개하는 실서비스 전환에는 운영자 심사가 필요합니다. 자격증명 설정과 사용자 동의는 계속 필요합니다. localhost 및 실제 Preview 연결 절차는 [개발 안내](local-development.md)를 참고하세요. 게임별 최근 플레이·선택 항목·캐시 무효화는 [현재 규격](record-adapters.md)을 참고하세요.
+
 # 신규 개발자 관점의 연동 온보딩 검토
 
 갱신일: 2026-10-20 (Australia/Sydney)
@@ -8,10 +10,10 @@
 
 | 목적 | 흐름 | 최소 준비 |
 | --- | --- | --- |
-| 내 서버에서 사용자의 Musecat 일반 기능 호출 | A | `/onboarding.json?flow=a`, 승인, `MUSECAT_CLIENT_SECRET` |
-| Musecat에 내 서비스 전적 제공 | B | `/onboarding.json?flow=b`, 승인, 파트너 OAuth 자격증명을 Musecat에 등록 |
+| 내 서버에서 사용자의 Musecat 일반 기능 호출 | A | `/onboarding.json?flow=a`, 등록, `MUSECAT_CLIENT_SECRET` |
+| Musecat에 내 서비스 전적 제공 | B | `/onboarding.json?flow=b`, 등록, 파트너 OAuth 자격증명을 Musecat에 등록 |
 | 두 방향을 공동 동의로 연결·해제 | Joint | 기본 `/onboarding.json` 또는 `?flow=joint`, 양쪽 OAuth 자격증명·Joint 키 교환 |
-| Musecat 계정으로 내 서비스 로그인 | OIDC | 별도 `?flow=login` 앱 승인, `MUSECAT_LOGIN_CLIENT_ID`·`MUSECAT_LOGIN_CLIENT_SECRET` |
+| Musecat 계정으로 내 서비스 로그인 | OIDC | 별도 `?flow=login` 앱 등록, `MUSECAT_LOGIN_CLIENT_ID`·`MUSECAT_LOGIN_CLIENT_SECRET` |
 
 여기서 방향은 데이터 접근 방향이며 시작 사이트와 다르다. A와 B를 따로 연결해도 자동으로 Joint가 되지 않는다. `account:access`는 문서화된 일반 사용자 쓰기를 포함하는 위임이고, OIDC의 `openid profile arcade:read`는 별도의 로그인·읽기 권한이다. 두 종류를 같은 동의로 설명하지 않는다.
 
@@ -19,19 +21,19 @@
 
 ### A 단방향 준비 상태와 흐름별 등록
 
-[A 구현](../partner/client.py)·[홈](../partner/web.py)은 A 준비 조건과 Joint 준비 조건을 분리한다. A만 사용할 때 Joint 키는 필요 없다. 홈에서 A/B/Joint 목적과 시작 동작을 구분하고 흐름별 JSON과 세 언어 안내를 제공한다. 준비 상태는 설정 존재 여부이며 승인·자격증명 유효성·서버 도달성을 보증하지 않는다.
+[A 구현](../partner/client.py)·[홈](../partner/web.py)은 A 준비 조건과 Joint 준비 조건을 분리한다. A만 사용할 때 Joint 키는 필요 없다. 홈에서 A/B/Joint 목적과 시작 동작을 구분하고 흐름별 JSON과 세 언어 안내를 제공한다. 준비 상태는 설정 존재 여부이며 등록·자격증명 유효성·서버 도달성을 보증하지 않는다.
 
 ### B 전용 등록의 불필요한 A callback 요구
 
-기존 검토에서 지적한 플랫폼 제약을 수정했다. 유효한 B 선언이 있으면 A를 생략할 수 있고, `/onboarding.json?flow=b`도 `direction_a` 자체를 생략한다. 개발자 센터에서 A를 끄고 B를 등록할 수 있다. 승인된 B 전용 앱은 파트너 자격증명만으로 제공자를 활성화하며, 뮤즈캣 발급 A 시크릿을 요구하거나 발급하지 않는다. A와 B 중 하나 이상은 필요하고, Musecat 로그인에는 A, Joint에는 A+B가 필요하다.
+기존 검토에서 지적한 플랫폼 제약을 수정했다. 유효한 B 선언이 있으면 A를 생략할 수 있고, `/onboarding.json?flow=b`도 `direction_a` 자체를 생략한다. 개발자 센터에서 A를 끄고 B를 등록할 수 있다. 등록된 B 전용 앱은 파트너 자격증명만으로 제공자를 활성화하며, 뮤즈캣 발급 A 시크릿을 요구하거나 발급하지 않는다. A와 B 중 하나 이상은 필요하고, Musecat 로그인에는 A, Joint에는 A+B가 필요하다.
 
 B 연결 성공은 Musecat 설정에서 연결 계정과 전적 조회로 확인한다. 샘플의 B grant 수는 토큰 교환된 권한 수이며 원격 캐시·프로필 노출 성공을 보증하지 않는다. 공개 프로필에는 파트너 공개 설정과 Musecat의 서비스 공개 설정을 모두 적용한다. 소유자는 연결한 서비스 탭에서 전적과 공개 설정을 확인할 수 있으며, 방문자에게는 공개된 서비스만 표시한다.
 
 ### 별도의 OIDC 로그인 예제
 
-[OIDC 구현](../partner/oidc.py)은 Musecat 로그인으로 자체 세션을 만드는 흐름을 제공한다. `/onboarding.json?flow=login`은 기존 A/B/Joint 앱과 다른 ID 및 정확한 공개 origin의 `/oidc/callback`을 선언하고 `direction_a.login_enabled: true`를 설정한다. 개발자가 실제 연락처를 입력하고 운영자 승인을 받은 뒤 별도 시크릿을 설정해야 한다.
+[OIDC 구현](../partner/oidc.py)은 Musecat 로그인으로 자체 세션을 만드는 흐름을 제공한다. `/onboarding.json?flow=login`은 기존 A/B/Joint 앱과 다른 ID 및 정확한 공개 origin의 `/oidc/callback`을 선언하고 `direction_a.login_enabled: true`를 설정한다. 개발자가 실제 연락처를 입력하고 등록을 저장한 뒤 별도 시크릿을 설정해야 한다.
 
-`MUSECAT_LOGIN_CLIENT_ID`는 초기화 시 기본적으로 `PARTNER_ID + "_login"`으로 생성한다(ID 길이 제한 적용). `MUSECAT_LOGIN_CLIENT_SECRET`에는 그 로그인 앱이 발급받은 시크릿을 넣는다. Alice의 승인된 A/B/Joint 앱을 로그인용으로 수정하면 기존 grant에 영향을 줄 수 있으므로 별도 앱을 유지한다.
+`MUSECAT_LOGIN_CLIENT_ID`는 초기화 시 기본적으로 `PARTNER_ID + "_login"`으로 생성한다(ID 길이 제한 적용). `MUSECAT_LOGIN_CLIENT_SECRET`에는 그 로그인 앱이 발급받은 시크릿을 넣는다. Alice의 등록된 A/B/Joint 앱을 로그인용으로 수정하면 기존 grant에 영향을 줄 수 있으므로 별도 앱을 유지한다.
 
 실행 흐름은 홈의 뮤즈캣 로그인 → Musecat 인증·동의 → 콜백 검증 → 별도 로컬 세션이다. PKCE S256, 세션에 묶인 state·nonce, RS256·`kid`·JWKS·issuer·audience·발급 시각·만료 검증과 UserInfo `sub` 일치를 확인한다. 로컬 ID는 issuer와 `sub`의 해시이며 데모 계정으로 자동 병합하지 않는다. 토큰은 서버에 암호화해 보관한다.
 
@@ -45,7 +47,7 @@ B 연결 성공은 Musecat 설정에서 연결 계정과 전적 조회로 확인
 
 | 오류 | 복구 행동 |
 | --- | --- |
-| `invalid_origin` | 정확한 HTTPS `PARTNER_ORIGIN`으로 접속; 터널 변경 시 설정·등록 URL 갱신 및 재승인 |
+| `invalid_origin` | 정확한 HTTPS `PARTNER_ORIGIN`으로 접속; 터널 변경 시 설정·등록 URL 갱신 및 등록 갱신 |
 | 설정 누락·`invalid_client`·잘못된 scope | 선택한 흐름과 앱 ID·해당 방향의 시크릿·승인 범위 확인 |
 | callback 불일치 | 공개 origin과 정확한 등록 경로 확인; 콜백 우회 금지 |
 | 잘못된 state·nonce·ID token | 같은 브라우저에서 새 로그인 시작; 콜백·코드 재사용 금지 |

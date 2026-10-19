@@ -1,0 +1,82 @@
+{
+  "spec": "musecat-records/v1",
+  "service": "nostalgia",
+  "sub": "sample:player",
+  "visibility": "public",
+  "updated_at": "2026-10-19T14:39:20Z",
+  "source": {
+    "name": "Musecat Partner Example · synthetic data",
+    "url": "https://partner.example"
+  },
+  "fields": [
+    {
+      "key": "grade",
+      "label": {
+        "en": "Grade",
+        "ko": "Grade",
+        "ja": "Grade"
+      },
+      "type": "decimal",
+      "value": 5000.25,
+      "precision": 2
+    }
+  ],
+  "sections": [],
+  "player": {
+    "name": "Demo Player"
+  },
+  "game_schema": "musecat-game/nostalgia/v1",
+  "recent_plays": {
+    "plays": [
+      {
+        "id": "synthetic-nostalgia-1",
+        "played_at": "2026-10-19T01:00:00Z",
+        "song": {
+          "id": "sample:song-1",
+          "title": "Synthetic song",
+          "artist": "Example artist"
+        },
+        "chart": {
+          "id": "sample:chart-1",
+          "difficulty": "EXPERT",
+          "mode": "basic"
+        },
+        "fields": [
+          {
+            "key": "score",
+            "label": {
+              "en": "Basic score",
+              "ko": "Basic score",
+              "ja": "Basic score"
+            },
+            "type": "integer",
+            "value": 990123
+          },
+          {
+            "key": "grd",
+            "label": {
+              "en": "Chart Grd",
+              "ko": "Chart Grd",
+              "ja": "Chart Grd"
+            },
+            "type": "decimal",
+            "value": 150.25,
+            "precision": 2
+          },
+          {
+            "key": "clear_lamp",
+            "label": {
+              "en": "Clear lamp",
+              "ko": "Clear lamp",
+              "ja": "Clear lamp"
+            },
+            "type": "string",
+            "value": "FULL COMBO"
+          }
+        ]
+      }
+    ],
+    "total": 1
+  },
+  "selection": []
+}

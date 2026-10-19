@@ -18,6 +18,7 @@ from .common import (
     require_csrf,
 )
 from .storage import digest
+from .common import profile_picture
 
 bp = Blueprint("oidc", __name__)
 SCOPES = "openid profile arcade:read"
@@ -292,6 +293,7 @@ def complete():
                 "name": identity.get("nickname")
                 or identity.get("preferred_username")
                 or "Musecat user",
+                "picture": profile_picture(identity.get("picture")),
                 "access": token["access_token"],
                 "revocation_token": revocation_token,
                 "expires_at": min(now() + token["expires_in"], claims["exp"]),

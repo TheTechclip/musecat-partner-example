@@ -83,9 +83,9 @@ MESSAGES = {
         "ja": "Musecat API アクセスは未連携です。",
     },
     "setup_hint": {
-        "en": "First get your app approved in Musecat Developer Center, then set the Musecat-issued keys in .env.",
-        "ko": "먼저 Musecat 개발자 센터에서 앱을 승인받고 .env의 Musecat 발급 키를 설정하세요.",
-        "ja": "先に Musecat 開発者センターでアプリの承認を受け、発行されたキーを .env に設定してください。",
+        "en": "First register your app in Musecat Developer Center, then set the Musecat-issued keys in .env.",
+        "ko": "먼저 Musecat 개발자 센터에서 앱을 등록하고 .env의 Musecat 발급 키를 설정하세요.",
+        "ja": "先に Musecat 開発者センターでアプリを登録し、発行されたキーを .env に設定してください。",
     },
     "connect_joint": {
         "en": "One-click bilateral connection",
@@ -326,9 +326,9 @@ MESSAGES.update(
             "ja": "Musecat 情報のみ連携",
         },
         "a_setup_hint": {
-            "en": "Set MUSECAT_CLIENT_SECRET after app approval. Joint keys are not needed for this flow.",
-            "ko": "앱 승인 후 MUSECAT_CLIENT_SECRET을 설정하세요. 이 흐름에는 양방향 연결 키가 필요 없습니다.",
-            "ja": "アプリ承認後に MUSECAT_CLIENT_SECRET を設定してください。このフローに双方向用キーは不要です。",
+            "en": "Set MUSECAT_CLIENT_SECRET after app registration. Joint keys are not needed for this flow.",
+            "ko": "앱 등록 후 MUSECAT_CLIENT_SECRET을 설정하세요. 이 흐름에는 양방향 연결 키가 필요 없습니다.",
+            "ja": "アプリ登録後に MUSECAT_CLIENT_SECRET を設定してください。このフローに双方向用キーは不要です。",
         },
         "flow_a_registration": {
             "en": "Registration JSON · Musecat data only",
@@ -417,9 +417,9 @@ MESSAGES.update(
             "ja": "サンプルのセッションは access/ID token とともに最大10分で失効します。期限後は再ログインしてください。ログアウト時にトークン解除を送信します。",
         },
         "oidc_setup": {
-            "en": "Register the login-only JSON as a separate app, enable login, obtain approval and set MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET.",
-            "ko": "로그인 전용 JSON으로 별도 앱을 등록하고 로그인 허용·승인을 받은 뒤 MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET을 설정하세요.",
-            "ja": "ログイン専用 JSON で別アプリを登録し、ログイン有効化・承認後に MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET を設定してください。",
+            "en": "Register the login-only JSON as a separate app, enable login and set MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET.",
+            "ko": "로그인 전용 JSON으로 별도 앱을 등록하고 로그인을 허용한 뒤 MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET을 설정하세요.",
+            "ja": "ログイン専用 JSON で別アプリを登録し、ログインを有効化して MUSECAT_LOGIN_CLIENT_ID / MUSECAT_LOGIN_CLIENT_SECRET を設定してください。",
         },
         "oidc_registration": {
             "en": "Registration JSON · OIDC login only",
@@ -436,6 +436,63 @@ MESSAGES.update(
             "ko": "서울시청 주변(37.5665, 126.978) 예제 조회입니다. 사용자 위치를 요청하지 않습니다。",
             "ja": "ソウル市庁付近（37.5665, 126.978）のデモ検索です。ユーザーの現在地は要求しません。",
         },
+    }
+)
+
+
+MESSAGES.update(
+    {
+        "profile_image": {
+            "en": "Musecat profile image",
+            "ko": "뮤즈캣 프로필 이미지",
+            "ja": "Musecat プロフィール画像",
+        },
+        "game_examples": {
+            "en": "Game adapters and sharing choices",
+            "ko": "게임별 어댑터와 전송 항목",
+            "ja": "ゲーム別アダプターと共有項目",
+        },
+        "synthetic_json": {
+            "en": "Synthetic example JSON (all fields)",
+            "ko": "합성 예제 JSON (전체 항목)",
+            "ja": "架空のサンプル JSON（全項目）",
+        },
+        "selection_hint": {
+            "en": "Checked groups are withheld from authenticated records. JSON example links always contain synthetic fixtures. Changes queue cache invalidation; failed notifications retry in the worker. The existing Joint example requests CHUNITHM only; register the B-only template to try all five games.",
+            "ko": "체크한 그룹은 인증된 전적 응답에서 제외됩니다. JSON 링크는 항상 합성 예제입니다. 변경 시 캐시 무효화를 전송하고 실패하면 worker가 재시도합니다. 기존 양방향 예제는 츄니즘만 요청하며, 다섯 게임은 B 전용 등록으로 시험하세요.",
+            "ja": "チェックしたグループは認証済み記録から除外します。JSON リンクは常に架空の例です。変更時にキャッシュ無効化を送り、失敗時は worker が再試行します。既存の双方向例は CHUNITHM のみで、5ゲームは B 専用登録で試せます。",
+        },
+        "exclude_player": {
+            "en": "Withhold player information",
+            "ko": "플레이어 정보 제외",
+            "ja": "プレーヤー情報を除外",
+        },
+        "exclude_fields": {
+            "en": "Withhold summary metrics",
+            "ko": "요약 지표 제외",
+            "ja": "集計指標を除外",
+        },
+        "exclude_sections": {
+            "en": "Withhold additional tables",
+            "ko": "추가 표 제외",
+            "ja": "追加の表を除外",
+        },
+        "exclude_recent_plays": {
+            "en": "Withhold recent plays",
+            "ko": "최근 플레이 제외",
+            "ja": "最近のプレーを除外",
+        },
+    }
+)
+
+
+MESSAGES.update(
+    {
+        "registration_policy": {
+            "en": "New apps run immediately for the owner and up to 10 named testers. General-user production access requires review. HTTP localhost callbacks work for local A/OIDC; remote Preview cannot fetch a PC-local B provider.",
+            "ko": "새 앱은 소유자와 지정 테스트 계정 10명까지 바로 사용할 수 있습니다. 일반 사용자 대상 실서비스는 승인 후 공개됩니다. 로컬 A/OIDC에는 HTTP localhost 콜백을 사용할 수 있으며 원격 preview는 PC의 로컬 B 서버를 호출할 수 없습니다.",
+            "ja": "新規アプリは所有者と指定テスター10名まで直ちに利用できます。一般向け本番公開は審査後です。ローカル A/OIDC は HTTP localhost コールバックを使えますが、遠隔 Preview は PC 内の B サーバーに接続できません。",
+        }
     }
 )
 

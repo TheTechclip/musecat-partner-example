@@ -22,9 +22,11 @@ from .common import (
     require_csrf,
     require_user,
     user,
+    queue_record_invalidation,
 )
 
 from .i18n import LANGUAGES
+from .record_examples import SERVICES, envelope
 
 bp = Blueprint("web", __name__)
 
@@ -40,6 +42,14 @@ def home():
         link = ledger().get(tx, "link", user()) if user() else None
         private = bool(ledger().get(tx, "private", user())) if user() else False
         pending = len(ledger().items(tx, "outbox"))
+        selections = (
+            {
+                game: (ledger().get(tx, "record_selection", user() + ":" + game) or [])
+                for game in SERVICES
+            }
+            if user()
+            else {}
+        )
         record_grants = sum(
             1
             for _, grant in ledger().items(tx, "grant")
@@ -53,6 +63,8 @@ def home():
         private=private,
         pending=pending,
         record_grants=record_grants,
+        services=SERVICES,
+        selections=selections,
         partner_id=current_app.config["PARTNER_ID"],
         a_ready=bool(current_app.config["MUSECAT_CLIENT_SECRET"]),
         oidc_ready=bool(
@@ -104,6 +116,7 @@ def privacy():
     require_csrf()
     uid = require_user()
     with ledger().transaction() as tx:
+        queue_record_invalidation(tx, uid, SERVICES)
         if request.form.get("private") == "yes":
             ledger().put(tx, "private", uid, True, now() + FAMILY)
         else:
@@ -142,7 +155,10 @@ def onboarding():
             "records_url": origin + "/api/records",
             "client_auth_method": "client_secret_basic",
             "identity_scope": "profile",
-            "services": [{"id": "chunithm", "scope": "chunithm:read"}],
+            "services": [
+                {"id": game, "scope": game + ":read"}
+                for game in (SERVICES if flow == "b" else ("chunithm",))
+            ],
         },
         joint={
             "enabled": True,
@@ -204,3 +220,30 @@ def language():
         raise ProtocolError("invalid_request")
     session["locale"] = selected
     return redirect(target)
+
+
+@bp.get("/record-examples/<service>")
+def record_example(service):
+    if service not in SERVICES:
+        raise ProtocolError("unsupported_service", 404)
+    return jsonify(envelope(service, "synthetic"))
+
+
+@bp.post("/records/selection")
+def record_selection():
+    require_csrf()
+    uid = require_user()
+    service = request.form.get("service", "")
+    if service not in SERVICES:
+        raise ProtocolError("unsupported_service", 404)
+    excluded = request.form.getlist("excluded")
+    if len(set(excluded)) != len(excluded) or not set(excluded).issubset(
+        {"player", "fields", "sections", "recent_plays"}
+    ):
+        raise ProtocolError("invalid_request")
+    with ledger().transaction() as tx:
+        queue_record_invalidation(tx, uid, [service])
+        ledger().put(
+            tx, "record_selection", uid + ":" + service, excluded, now() + FAMILY
+        )
+    return redirect("/")

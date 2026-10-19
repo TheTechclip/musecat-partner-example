@@ -27,6 +27,7 @@ from .common import (
     require_user,
     revoke_local,
     stamp,
+    profile_picture,
 )
 from .storage import digest
 
@@ -46,6 +47,7 @@ def save_link(tx, uid, token, identity, attempt):
         "id": opaque(),
         "sub": identity["sub"],
         "name": identity.get("nickname") or identity.get("username") or "Musecat user",
+        "picture": profile_picture(identity.get("picture")),
         "access": token["access_token"],
         "refresh": token["refresh_token"],
         "revocation_token": token["refresh_token"],
@@ -325,4 +327,9 @@ def profile():
     verify_link(uid, link)
     if request.form.get("format") == "json":
         return jsonify(data)
-    return render_template("profile.html", data=data, profile=account)
+    return render_template(
+        "profile.html",
+        data=data,
+        profile=account,
+        picture=profile_picture(identity.get("picture")),
+    )

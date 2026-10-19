@@ -1,0 +1,90 @@
+{
+  "spec": "musecat-records/v1",
+  "service": "iidx",
+  "sub": "sample:player",
+  "visibility": "public",
+  "updated_at": "2026-10-19T14:39:20Z",
+  "source": {
+    "name": "Musecat Partner Example · synthetic data",
+    "url": "https://partner.example"
+  },
+  "fields": [
+    {
+      "key": "sp_dan",
+      "label": {
+        "en": "SP dan",
+        "ko": "SP dan",
+        "ja": "SP dan"
+      },
+      "type": "string",
+      "value": "CHUDEN"
+    }
+  ],
+  "sections": [],
+  "player": {
+    "name": "Demo Player"
+  },
+  "game_schema": "musecat-game/iidx/v1",
+  "recent_plays": {
+    "plays": [
+      {
+        "id": "synthetic-iidx-1",
+        "played_at": "2026-10-19T01:00:00Z",
+        "song": {
+          "id": "sample:song-1",
+          "title": "Synthetic song",
+          "artist": "Example artist"
+        },
+        "chart": {
+          "id": "sample:chart-1",
+          "difficulty": "ANOTHER",
+          "mode": "SP"
+        },
+        "fields": [
+          {
+            "key": "ex_score",
+            "label": {
+              "en": "EX score",
+              "ko": "EX score",
+              "ja": "EX score"
+            },
+            "type": "integer",
+            "value": 2800
+          },
+          {
+            "key": "miss_count",
+            "label": {
+              "en": "Miss count",
+              "ko": "Miss count",
+              "ja": "Miss count"
+            },
+            "type": "integer",
+            "value": 12
+          },
+          {
+            "key": "clear_lamp",
+            "label": {
+              "en": "Clear lamp",
+              "ko": "Clear lamp",
+              "ja": "Clear lamp"
+            },
+            "type": "string",
+            "value": "HARD CLEAR"
+          },
+          {
+            "key": "dj_level",
+            "label": {
+              "en": "DJ level",
+              "ko": "DJ level",
+              "ja": "DJ level"
+            },
+            "type": "string",
+            "value": "AA"
+          }
+        ]
+      }
+    ],
+    "total": 1
+  },
+  "selection": []
+}

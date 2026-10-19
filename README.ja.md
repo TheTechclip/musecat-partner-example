@@ -1,8 +1,12 @@
 # Musecat Partner Example
 
 [English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md)
+有効な登録は開発モードで所有者と指定テスター最大10名が直ちに利用できます。一般ユーザー向けの本番公開には運営承認が必要です。認証情報とユーザー同意は両モードで必要です。B 専用登録は5ゲームを宣言し、既存の双方向例は CHUNITHM の manifest を維持します。[ゲーム別規格・最近のプレー・共有項目・キャッシュ無効化](docs/record-adapters.md)。
+
 
 Musecat Preview と連携する **開発・テスト用サンプル**です。Python + Flask + SQLite、Docker Compose、任意の Caddy HTTPS 構成、MIT ライセンス。`alice` / `bob` の2つのデモアカウントと架空の CHUNITHM 記録を使用します。学習用の例であり、OAuth/OIDC プロバイダーの完全な実装ではありません。
+
+[localhost と実際の Preview 接続手順](docs/local-development.md)
 
 ## 確認できるフロー
 
@@ -31,19 +35,19 @@ Musecat Preview と連携する **開発・テスト用サンプル**です。Py
 | Musecat からサンプル記録を取得（B のみ） | Musecat 設定 → 通常の外部アカウント連携 → サンプルの CHUNITHM を選択して接続 | `/onboarding.json?flow=b` | 不要。生成済みパートナー OAuth ID/シークレットを Musecat に設定 |
 | 統合同意で双方向連携 | どちらのサービスでも **ワンクリック双方向連携** | `/onboarding.json?flow=joint`（既定） | `MUSECAT_CLIENT_SECRET` と `PARTNER_TO_MUSECAT_KEY`。生成済み OAuth 情報と `MUSECAT_TO_PARTNER_KEY` も Musecat に設定 |
 
-すべてのモードは生成済みのローカルセッション・暗号化・デモ用シークレットを使います。未使用モードのキーは `.env` に残せますが、交換は不要です。アプリ承認と正確なコールバック登録は共通です。**B 専用アプリを登録できます。** `/onboarding.json?flow=b` は `direction_a` 自体を省略します。開発者センターで A を無効にして B を宣言すると、A コールバック・Musecat 発行の A シークレット・Joint キーは不要です。承認済みの全機能アプリなら登録変更なしで三つのフローを個別に試せます。ボタンを切り替えるために三つの JSON を交互に再申請しないでください。承認設定の変更は既存の同意を無効にする場合があります。
+すべてのモードは生成済みのローカルセッション・暗号化・デモ用シークレットを使います。未使用モードのキーは `.env` に残せますが、交換は不要です。アプリ登録と正確なコールバック登録は共通です。**B 専用アプリを登録できます。** `/onboarding.json?flow=b` は `direction_a` 自体を省略します。開発者センターで A を無効にして B を宣言すると、A コールバック・Musecat 発行の A シークレット・Joint キーは不要です。登録済みの全機能アプリなら登録変更なしで三つのフローを個別に試せます。ボタンを切り替えるために三つの JSON を交互に再申請しないでください。承認設定の変更は既存の同意を無効にする場合があります。
 
 A は **片方向 Musecat API 連携**が表示され、公開プロフィールを取得できれば成功です。`account:access` は文書化された一般ユーザーの更新操作も許可し、読み取り専用 scope や OIDC ログインではありません。B は Musecat でアカウント接続と架空記録の取得を確認します。**プロフィール公開は別に有効化**して公開プロフィールを確認してください。サンプルの同意数はトークン交換済みの権限であり、Musecat のキャッシュ・実際の表示状態を保証しません。B のみの解除は Musecat 設定で行います。A のみ解除しても独立した B 権限は残ります。個別の同意二つが自動的に共同連携になることはありません。
 
-Alice のデモを保って別のモードを試すには `bob` を使います。ただし Musecat のアカウント重複連携ルールは適用されます。同じ Musecat アカウントを競合するデモに承認せず、変更時は既存連携を明示的に解除してください。独立した **Musecat でログイン**は以下の手順で実装されています。Alice の承認済み A/B/Joint アプリを編集せず、ログイン用アプリを別に登録してください。設定変更の承認で既存 grant が無効になる場合があります。
+Alice のデモを保って別のモードを試すには `bob` を使います。ただし Musecat のアカウント重複連携ルールは適用されます。同じ Musecat アカウントを競合するデモに承認せず、変更時は既存連携を明示的に解除してください。独立した **Musecat でログイン**は以下の手順で実装されています。Alice の登録済み A/B/Joint アプリを編集せず、ログイン用アプリを別に登録してください。設定変更の承認で既存 grant が無効になる場合があります。
 
 ### 最初の接続に失敗した場合
 
 | 症状 | 確認・復旧 |
 | --- | --- |
-| A ボタンが無効 | 承認済み Client Secret を `MUSECAT_CLIENT_SECRET` に設定。双方向キーの交換は不要 |
-| Musecat にプロバイダーがない | 開発者センターの承認、承認済み B 宣言、パートナー OAuth 資格情報を確認 |
-| `invalid_origin` | 正確な HTTPS `PARTNER_ORIGIN` で開く。トンネル変更後は origin・承認 URL を更新しコンテナーを再作成 |
+| A ボタンが無効 | 登録済み Client Secret を `MUSECAT_CLIENT_SECRET` に設定。双方向キーの交換は不要 |
+| Musecat にプロバイダーがない | 開発者センターの登録、登録済み B 宣言、パートナー OAuth 資格情報を確認 |
+| `invalid_origin` | 正確な HTTPS `PARTNER_ORIGIN` で開く。トンネル変更後は origin・登録 URL を更新しコンテナーを再作成 |
 | `invalid_client`・コールバック拒否 | キーの発行元・方向と登録コールバックの完全一致を確認 |
 | `invalid_grant`・state 不一致・期限切れ | 同じブラウザーセッションで開始し直す。コード・コールバックは再利用せず、refresh 消費後は再接続 |
 | `records_private`・記録が表示されない | サンプルの公開状態、Musecat の公開スイッチ、キャッシュ・更新制限を確認 |
@@ -77,7 +81,7 @@ docker compose up -d --build
 docker compose ps
 ```
 
-ブラウザーでも **HTTPS トンネルの URL** を開いてください。Cookie は Secure です。トンネル URL が変わると issuer と callback も変わるため、アプリの URL を変更して再承認を受け、再連携してください。Quick Tunnel は一時テスト用です。固定アドレスには named tunnel または固定ドメインを使います。
+ブラウザーでも **HTTPS トンネルの URL** を開いてください。Cookie は Secure です。トンネル URL が変わると issuer と callback も変わるため、アプリの URL を変更して登録更新を受け、再連携してください。Quick Tunnel は一時テスト用です。固定アドレスには named tunnel または固定ドメインを使います。
 
 ### 方法 B: 固定ドメイン + Caddy
 
@@ -99,7 +103,7 @@ Musecat 発行キーがなくてもサンプルは起動します。`.env` の `
 
 1. **アプリ登録 JSON** (`/onboarding.json`) を開きます。実際の URL と生成済み `PARTNER_ID` が含まれます。
 2. 開発者センターで選択したフローの JSON を使って登録し、基本情報とその JSON に含まれる方向だけを入力します。`contact_email` を自分の連絡先に変更します。
-3. Musecat 運営者に承認を申請します。サンプルで承認を迂回することはありません。
+3. 有効な登録を保存します。運営者の承認なしで直ちに利用できます。
 4. 以下の認証情報を交換します。値はサーバー専用です。GitHub Issue、スクリーンショット、フロントエンド JavaScript に載せないでください。
 
 | 認証情報 | 発行元 | 設定先 |
@@ -135,8 +139,8 @@ docker compose up -d --build --force-recreate
 ## 2.1. 独立した Musecat でログイン（OIDC）
 
 1. `python3 scripts/init-env.py` を再実行し、既存の値を維持して不足設定を追加します。`MUSECAT_LOGIN_CLIENT_ID` の既定値は `PARTNER_ID + "_login"` で、ID 長の制限に合わせて先頭部分を短縮します。既存 A/B/Joint アプリと認証情報は変更しません。
-2. `/onboarding.json?flow=login` から開発者センターに **別アプリ**を登録します。アプリ ID を `MUSECAT_LOGIN_CLIENT_ID` に合わせ、A と `direction_a.login_enabled: true` を有効にし、正確な `<PARTNER_ORIGIN>/oidc/callback` を登録します。このテンプレートに B・Joint は含まれません。連絡先を実際の情報に変更し、運営者の審査を申請します。
-3. 承認後、そのログインアプリの Client Secret を発行し、`.env` の `MUSECAT_LOGIN_CLIENT_SECRET` に設定します。`docker compose up -d --build --force-recreate` で再作成してください。既存 A/B/Joint アプリのシークレットを流用しません。
+2. `/onboarding.json?flow=login` から開発者センターに **別アプリ**を登録します。アプリ ID を `MUSECAT_LOGIN_CLIENT_ID` に合わせ、A と `direction_a.login_enabled: true` を有効にし、正確な `<PARTNER_ORIGIN>/oidc/callback` を登録します。このテンプレートに B・Joint は含まれません。連絡先を実際の情報に変更し、開発登録を保存します。一般公開時に本番審査を申請します。
+3. 登録後、そのログインアプリの Client Secret を発行し、`.env` の `MUSECAT_LOGIN_CLIENT_SECRET` に設定します。`docker compose up -d --build --force-recreate` で再作成してください。既存 A/B/Joint アプリのシークレットを流用しません。
 4. 正確な公開 HTTPS origin のホームで **Musecat でログイン**を選択します。デモログインは不要です。Musecat でログインし `openid profile arcade:read` に同意すると、検証済み ID に基づくローカルセッションを作成します。既存デモセッションは置き換えますが、保存済み A/B/Joint grant の統合・解除は行いません。
 5. ログイン済みホームの近隣施設参照（`POST /oidc/nearby`）を実行します。ソウル中心・半径 5 km 固定の読み取り要求です。端末位置を取得せず、施設の全件一覧を公開しません。このログインでは `account:access` API コンソールやデモ記録操作の権限は得られません。
 6. **ログアウト**（`POST /logout`）でローカルアクセスを直ちに終了し、worker が暗号化された永続 outbox でトークン失効を再試行します。Musecat 全体のログアウトや Alice の独立した A/B/Joint grant の解除ではありません。送信完了まで worker を稼働してください。

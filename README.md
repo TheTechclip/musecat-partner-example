@@ -1,8 +1,12 @@
 # Musecat Partner Example
 
 [English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md)
+Validated registration is immediately usable in development by its owner and up to ten named testers. Production access for general users requires operator approval. Configure each enabled direction’s credentials and obtain user consent. The B-only template declares all five games; the existing Joint sample keeps CHUNITHM to preserve its original manifest. [Game mappings, recent plays, selection and invalidation](docs/record-adapters.md).
+
 
 A runnable **development and testing sample** for Musecat Preview. Python + Flask + SQLite, Docker Compose, optional Caddy HTTPS, MIT license. Two demo accounts (`alice`, `bob`) use synthetic CHUNITHM records. This is a learning example, not a complete OAuth/OIDC provider.
+
+[Localhost and one-command real Preview setup](docs/local-development.md)
 
 ## Supported flows
 
@@ -31,19 +35,19 @@ This example uses the delegation scope `account:access` and the documented `/dev
 | Musecat reads sample CHUNITHM records (B only) | Musecat settings → ordinary external account connection → this sample → select CHUNITHM → connect | `/onboarding.json?flow=b` | None; configure the generated partner OAuth client ID/secret in Musecat |
 | Both directions with managed shared consent | **One-click bilateral connection** in either service | `/onboarding.json?flow=joint` (default) | `MUSECAT_CLIENT_SECRET` and `PARTNER_TO_MUSECAT_KEY`; also exchange the generated partner OAuth credentials and `MUSECAT_TO_PARTNER_KEY` |
 
-All modes still use the generated local session/encryption/demo secrets. Generated keys for unused modes may remain in `.env`; you do not need to exchange them. App approval and exact callback matching still apply. B-only registration is supported: `/onboarding.json?flow=b` omits `direction_a` entirely. In Developer Center, disable A and declare B; no A callback, Musecat-issued A secret, or Joint keys are required. Do not register the three templates as successive updates merely to switch demo buttons: an already approved full app can exercise A, B and Joint independently, and approved configuration changes can invalidate grants.
+All modes still use the generated local session/encryption/demo secrets. Generated keys for unused modes may remain in `.env`; you do not need to exchange them. Validated registration and exact callback matching still apply; operator approval is not required for owner/tester development use. B-only registration is supported: `/onboarding.json?flow=b` omits `direction_a` entirely. In Developer Center, disable A and declare B; no A callback, Musecat-issued A secret, or Joint keys are required. Do not register the three templates as successive updates merely to switch demo buttons: an already registered full app can exercise A, B and Joint independently, and registered configuration changes can invalidate grants.
 
 For A, success means the sample displays a **one-way Musecat API connection** and can read the public profile. `account:access` also authorizes documented general-user mutations; this is not a read-only scope or OIDC sign-in. For B, success means Musecat shows the connected account and can fetch synthetic records. Enable **profile sharing** separately, then verify the public profile. Sample-side grant counts show issued/exchanged permission, not Musecat's cached or currently displayed profile. Manage B-only disconnection in Musecat settings. A-only disconnection does not revoke an independent B grant. Two independent grants do not automatically become a managed Joint pair.
 
-Use `bob` to try another mode without disturbing Alice's demonstration. A different sample account does not bypass Musecat's account-binding rules: do not approve the same Musecat account into a conflicting demo binding. Disconnect deliberately before changing bindings. Standalone “Sign in with Musecat” is implemented separately below. Use a separate login app instead of changing Alice’s approved A/B/Joint app, because approving configuration changes can invalidate its existing grants.
+Use `bob` to try another mode without disturbing Alice's demonstration. A different sample account does not bypass Musecat's account-binding rules: do not approve the same Musecat account into a conflicting demo binding. Disconnect deliberately before changing bindings. Standalone “Sign in with Musecat” is implemented separately below. Use a separate login app instead of changing Alice’s registered A/B/Joint app, because saving configuration changes can invalidate its existing grants.
 
 ### When first connection fails
 
 | Symptom | Check / next action |
 | --- | --- |
-| Missing/disabled A action | Obtain the approved app's Client Secret and set `MUSECAT_CLIENT_SECRET`; no Joint key exchange is needed |
-| Missing provider in Musecat | Confirm app approval, approved Direction B declaration and partner OAuth credentials in Developer Center |
-| `invalid_origin` | Open the exact HTTPS `PARTNER_ORIGIN`; after a tunnel change update origin, approved URLs and recreate containers |
+| Missing/disabled A action | Obtain the registered app's Client Secret and set `MUSECAT_CLIENT_SECRET`; no Joint key exchange is needed |
+| Missing provider in Musecat | Confirm saved Direction B declaration and partner OAuth credentials in Developer Center |
+| `invalid_origin` | Open the exact HTTPS `PARTNER_ORIGIN`; after a tunnel change update origin, registered URLs and recreate containers |
 | `invalid_client` or callback rejection | Check credential issuer/direction and exact registered callback, including locale-independent B callback |
 | `invalid_grant`, invalid state, expired flow | Start a fresh flow in the same browser session; do not reuse a callback/code; reconnect if refresh was consumed |
 | `records_private` or profile shows nothing | Check sample privacy, Musecat service's profile-sharing switch, cache status and refresh limit |
@@ -77,7 +81,7 @@ docker compose up -d --build
 docker compose ps
 ```
 
-Open the **HTTPS tunnel URL in your browser**: session cookies are Secure. A changed tunnel URL changes the issuer and callbacks; update the app URLs, obtain approval again, and reconnect. Quick Tunnels are temporary; use a named tunnel or a fixed domain for a stable address.
+Open the **HTTPS tunnel URL in your browser**: session cookies are Secure. A changed tunnel URL changes the issuer and callbacks; update the app URLs, save the updated registration, and reconnect. Quick Tunnels are temporary; use a named tunnel or a fixed domain for a stable address.
 
 ### Option B: fixed domain with Caddy
 
@@ -99,7 +103,7 @@ The sample starts without Musecat-issued keys. Sign in as `alice` or `bob` using
 
 1. Open **App registration JSON** (`/onboarding.json`), populated with the actual URLs and generated `PARTNER_ID`.
 2. Register an app in Developer Center using the selected flow JSON. Enter general information and only the directions present in that template. Replace `contact_email` with your contact address.
-3. Request Musecat operator approval. The sample does not bypass approval.
+3. Save the validated registration. It activates immediately without operator approval.
 4. Exchange the credentials below. Keep values server-side; do not publish them in GitHub issues, screenshots, or frontend JavaScript.
 
 | Credential | Issuer | Destination |
@@ -135,8 +139,8 @@ Preserve `DATA_KEY` and `SESSION_SECRET` across restarts. Losing the encryption 
 ## 2.1. Standalone Sign in with Musecat (OIDC)
 
 1. Run `python3 scripts/init-env.py` again to add missing settings while preserving existing values. The default `MUSECAT_LOGIN_CLIENT_ID` is `PARTNER_ID + "_login"` (the base is truncated to fit the partner ID limit). Keep the existing A/B/Joint app and credentials unchanged.
-2. Open `/onboarding.json?flow=login` and register **a separate app** in Developer Center. Its partner ID must equal `MUSECAT_LOGIN_CLIENT_ID`; enable A and `direction_a.login_enabled: true`, and register exactly `<PARTNER_ORIGIN>/oidc/callback`. This template does not declare B or Joint. Replace the example contact details and request operator review.
-3. After approval, issue that app's Client Secret, set `MUSECAT_LOGIN_CLIENT_SECRET` in `.env`, and recreate the containers: `docker compose up -d --build --force-recreate`. Never put the A/B/Joint app's secret into this setting.
+2. Open `/onboarding.json?flow=login` and register **a separate app** in Developer Center. Its partner ID must equal `MUSECAT_LOGIN_CLIENT_ID`; enable A and `direction_a.login_enabled: true`, and register exactly `<PARTNER_ORIGIN>/oidc/callback`. This template does not declare B or Joint. Replace the example contact details and save the validated registration; no operator review is required for development use.
+3. After registration, issue that app's Client Secret, set `MUSECAT_LOGIN_CLIENT_SECRET` in `.env`, and recreate the containers: `docker compose up -d --build --force-recreate`. Never put the A/B/Joint app's secret into this setting.
 4. Open the exact public HTTPS origin, then choose **Sign in with Musecat** on the home page. Demo login is not required. Complete Musecat login and consent for `openid profile arcade:read`; the callback returns to a local session derived from the verified identity. An existing local demo session is replaced, but its stored A/B/Joint grants are not merged or disconnected.
 5. Use the signed-in home page's nearby-arcade action (`POST /oidc/nearby`). It makes a read-only request centered on Seoul with a fixed 5 km radius; it does not request your device's location or expose an arcade-directory export. This login does not enable the `account:access` API console or demo-account record tools.
 6. Choose **Sign out** (`POST /logout`). Local access ends immediately and the worker retries token revocation through the encrypted persistent outbox. This does not sign you out of Musecat globally or disconnect Alice's separate A/B/Joint grants. Keep the worker running to deliver pending revocations.

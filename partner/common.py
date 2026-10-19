@@ -16,7 +16,14 @@ from flask import current_app, request, session
 from .storage import digest
 
 MANIFEST = "musecat-joint/v1"
-SCOPES = ["profile", "chunithm:read"]
+SCOPES = [
+    "profile",
+    "maimai:read",
+    "chunithm:read",
+    "sdvx:read",
+    "iidx:read",
+    "nostalgia:read",
+]
 FAMILY = 30 * 24 * 3600
 
 
@@ -216,3 +223,47 @@ def revoke_local(tx, pair_id, generation):
         if link.get("pair_id") == pair_id and link.get("generation") == generation:
             ledger().delete(tx, "link", uid)
     return "revoked" if active else "already_revoked"
+
+
+def profile_picture(value):
+    """Display only the configured Musecat issuer's public file URLs."""
+    if not isinstance(value, str) or len(value) > 2048:
+        return None
+    parsed, issuer = (
+        urllib.parse.urlsplit(value),
+        urllib.parse.urlsplit(current_app.config["MUSECAT_ISSUER"]),
+    )
+    if (
+        parsed.scheme == "https"
+        and parsed.netloc == issuer.netloc
+        and not parsed.username
+        and not parsed.password
+        and not parsed.fragment
+        and parsed.path.startswith("/api/files/")
+    ):
+        return value
+    return None
+
+
+def queue_record_invalidation(tx, uid, services):
+    active = any(
+        grant["user"] == uid and grant.get("exchanged") and not grant["revoked"]
+        for _, grant in ledger().items(tx, "grant")
+    )
+    if active and not current_app.config["PARTNER_TO_MUSECAT_KEY"]:
+        raise ProtocolError("musecat_configuration_required", 503)
+    if not active:
+        return
+    for service in services:
+        ledger().put(
+            tx,
+            "outbox",
+            "records-" + opaque(),
+            {
+                "kind": "records",
+                "body": {"sub": "sample:" + uid, "service": service},
+                "next": now(),
+                "attempts": 0,
+            },
+            now() + FAMILY,
+        )

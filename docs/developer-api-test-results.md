@@ -1,20 +1,46 @@
-# Developer API example verification
+# Developer API and game adapter verification
 
-Verified on 2026-10-20 against `https://db-dev.musecat.app` and Musecat Preview.
+Verified on 2026-10-20 against **https://preview.musecat.app** and **https://db-dev.musecat.app**, using the runnable local Docker example. All game records in these tests are synthetic; no real NosLog/CHUNITHM Info account integration is implied.
 
-The bundled contract contains **104 operations across 92 paths**, with **112 operation/content-type variants**. Generic execution covers 95 resource/public-metadata operations; nine OAuth/first-party-session operations have curl/reference examples with their distinct authentication flows. Both bulk arcade-list routes are excluded.
+## Deployed implementation
 
-## B-only, OIDC and recovery rollout
+- Core `3f75331593d4`, Full `f0066e1`, Preview `18a9fca092a9`.
+- Full's guarded `1792030011_partner_publication` migration preserves previously active approved registrations as production; unapproved legacy apps remain development. Existing Alice A/B/Joint grants remained usable after migration.
+- A consistent development database backup passed SQLite integrity verification before rollout.
+- Core and Full full suites passed. Web **2703 tests** passed, plus final focused route/UI checks, typecheck, lint/source conventions and i18n. Sample **44 tests** passed; all five JSON fixtures passed the actual Core `ParseEnvelope`.
 
-- Core `83c7a5821cfe` and Full `7e7151b9a743` were deployed to the development API; Preview `fcef776e07ba` was deployed successfully. No DB schema migration was required. A consistent development DB backup passed verification before rollout.
-- Core and Full full test suites passed. Preview Web tests passed **2692 tests**, with type, lint, source-convention and i18n checks. The sample passes **37 tests**, including RSA-signed ID-token validation, wrong issuer/audience/nonce/expiry, one-use and session-bound callback handling, separate local identity, expiry/logout revocation, malformed upstream payloads, localized recovery and idempotent environment initialization that preserves existing secrets.
-- A separate records-only app was registered with **no `direction_a` and no A callback**. Operator review and partner OAuth credentials activated B independently; attempting A secret issuance returned 409. Actual Preview start and callback completed with the isolated sample. The validated CHUNITHM record cache returned synthetic rating 16.42 with `sub` stripped. Public/private publication gates and disconnect passed. The temporary provider was then deactivated and its isolated tunnel/container/test volume removed.
-- A separate opt-in login app completed **real Preview OIDC consent → token exchange → RS256/JWKS/nonce/issuer/audience/expiry validation → matching UserInfo → a distinct local login session**. Its requested scopes were exactly `openid profile arcade:read`. The server-held login access token successfully called nearby arcade discovery. Local logout and the worker revoked the actual Musecat grant. The approved login example remains configured for use.
-- Existing Alice's A/B/Joint connection was retained. After registry changes and test cleanup, its actual profile and passport reads still matched third-party visibility, and both external bulk-list aliases remained blocked (GET/HEAD404 and403 respectively).
-- Browser verification confirmed **츄니즘** beside Profile/Passport and the existing rich synthetic CHUNITHM presentation at `/kr/p/eric/records/chunithm`. Owners can inspect connected services; visitor navigation is limited to public records by server-side data selection and covered by regression tests.
-- Live HTTPS recovery pages rendered in English, Korean and Japanese; the same API/JSON request retained its stable machine-readable error. No callback codes or raw upstream descriptions are displayed in recovery guidance.
-- A synthetic SDVX envelope with VOLFORCE/skill fields and score/lamp columns was accepted by the actual Core `ParseEnvelope` without CHUNITHM fields. This verifies the common envelope/generic-display contract, not a real SDVX/Nostalgia provider adapter or game-specific rich UI.
+## Real Preview end-to-end verification
 
-Live actions used the existing synthetic test owner and separate test apps. The user explicitly approved two-minute nonrefreshable test authentication from consistent copied development DBs. No accounts, passwords or roles were changed. Temporary authentication files, copied databases and secondary credential copies were removed; production data and the existing user's connections were not altered. No account responses, tokens or secrets are published in this report.
+A separate empty-volume provider and dedicated test apps were used. All of the following completed against the deployed servers, not only mocks:
 
-The OIDC sample intentionally uses short-lived sessions without silent refresh. Changing API examples require explicit confirmation and were not automatically run against the connected user’s real data. The private/summary/full visibility matrix is covered by disposable Core fixtures; real-user privacy settings were not changed. See [record adapter responsibilities](record-adapters.md) and [onboarding review](onboarding-review.ko.md) for remaining partner-side responsibilities.
+1. B-only app registration activated development immediately; no A callback/secret or operator approval was required. Partner OAuth credentials and an independent records invalidation key were configured.
+2. Anonymous/non-tester provider discovery excluded the app. Adding a named tester enabled discovery; removal blocked it again. The owner remained eligible.
+3. Actual Preview BFF start → sample consent → PKCE code exchange → Preview callback completed. Musecat fetched and cached **maimai, CHUNITHM, SOUND VOLTEX, IIDX and NOSTALGIA**, including each game's recent song/chart/performance. The authenticated partner subject was stripped from returned payloads.
+4. Withholding NOSTALGIA recent plays removed the entire history object. Real authenticated cache invalidation and an immediate owner read returned the reduced envelope with `selection.status: denied`. Other authorized data remained.
+5. A development record stayed absent from anonymous profile output even when its owner enabled publication.
+6. Production submission, operator rejection preserving development, resubmission and approval succeeded. Reconnecting the production provider and explicitly publishing CHUNITHM made its record visible publicly. Disconnect removed the connection; the temporary provider was then deactivated.
+7. A dedicated development OIDC app accepted an exact **HTTP localhost callback** and rejected production submission with that callback. A local HTTP sample completed real Preview consent → localhost callback → RS256/JWKS/issuer/audience/nonce validation → local session → nearby arcade API → logout and token revocation. Scopes were exactly `openid profile arcade:read`.
+8. The existing connected Musecat profile returned a public absolute avatar `picture`; an image HEAD request returned 200. The sample permits that configured issuer in its image CSP and displays the URL safely.
+9. Browser inspection of the deployed `/kr/p/eric/records/chunithm` tab confirmed the existing rich dashboard and a newly fetched recent-play card with song, chart, timestamp, score and clear lamp.
+
+Both temporary test apps were suspended after verification. Their isolated tunnel/container/volume and secondary credentials were removed. The primary demo and existing user's connections were retained. User-approved two-minute nonrefreshable test authentication stayed inside protected server files; those files and consistent copied DBs were removed. Accounts, passwords and roles were not changed.
+
+## Privacy and API regression checks
+
+The retained Alice connection was checked after rollout using read-only requests:
+
+- `GET`/`HEAD /developer/v1/arcades`: **404**.
+- `GET`/`HEAD /developer/v1/account/arcades`: **403**.
+- Connected profile favorites, games, countries and visit projections matched ordinary third-party reads.
+- Passport aggregates/stamps matched ordinary public responses. Private/summary/full matrices and removal races are covered by disposable backend fixtures, without changing the real user's settings.
+- The developer contract and sample exclude both bulk arcade-list aliases.
+
+The API example catalog retains **104 operations / 92 paths / 112 operation-content variants**: 95 generic resource/metadata operations and nine OAuth/session reference operations. Mutating examples require explicit confirmation and were not batch-executed against the connected user's real data.
+
+## Developer experience and limits
+
+[Localhost and actual Preview setup](local-development.md) includes A/OIDC without local HTTPS, plus a one-command optional tunnel for B/Joint. The tunnel command was run against the isolated synthetic provider; it preserved credentials and generated the HTTPS origin automatically. A fixed reachable deployment is also supported. Remote Preview cannot directly call a developer PC's localhost; local unit/schema tests alone are not represented as successful integration.
+
+[Game mappings and research sources](record-adapters.md) define the five optional game vocabularies, recent-play contract, selected-field omission and cache invalidation. They preserve source units and version/mode distinctions; they do not implement arbitrary publisher APIs, calculate undocumented rating formulas or claim cross-provider chart-ID equivalence. A real provider must apply its own user's export/privacy choices and deliver invalidations. Notification delivery can be delayed by network failure; previously downloaded copies cannot be recalled.
+
+No account response bodies, tokens, database files or client secrets are published in this report.

@@ -48,8 +48,13 @@ def create_app(overrides=None):
     )
     for name in ["PARTNER_ORIGIN", "MUSECAT_ISSUER", "MUSECAT_WEB_ORIGIN"]:
         parsed = urlsplit(app.config[name])
+        local_origin = (
+            name == "PARTNER_ORIGIN"
+            and parsed.scheme == "http"
+            and parsed.hostname in {"localhost", "127.0.0.1"}
+        )
         if (
-            parsed.scheme != "https"
+            (parsed.scheme != "https" and not local_origin)
             or not parsed.hostname
             or parsed.username
             or parsed.password
@@ -57,7 +62,10 @@ def create_app(overrides=None):
             or parsed.query
             or parsed.fragment
         ):
-            raise ValueError(name + " must be an HTTPS origin without a trailing slash")
+            raise ValueError(
+                name
+                + " must be an HTTPS origin (or a local HTTP partner origin) without a trailing slash"
+            )
     if not re.fullmatch(r"[a-z][a-z0-9_-]{0,127}", app.config["PARTNER_ID"]):
         raise ValueError("PARTNER_ID is required")
     for name in [
@@ -73,7 +81,7 @@ def create_app(overrides=None):
             )
     app.config.update(
         SECRET_KEY=app.config["SESSION_SECRET"],
-        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_SECURE=urlsplit(app.config["PARTNER_ORIGIN"]).scheme == "https",
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         TRUSTED_HOSTS=[urlsplit(app.config["PARTNER_ORIGIN"]).hostname, "localhost"],
@@ -108,7 +116,9 @@ def create_app(overrides=None):
                 if request.path in {"/oauth/musecat/callback", "/oidc/callback"}
                 else "same-origin",
                 "X-Content-Type-Options": "nosniff",
-                "Content-Security-Policy": "default-src 'self'; style-src 'self'; frame-ancestors 'none'; form-action 'self' "
+                "Content-Security-Policy": "default-src 'self'; style-src 'self'; img-src 'self' "
+                + app.config["MUSECAT_ISSUER"]
+                + "; frame-ancestors 'none'; form-action 'self' "
                 + app.config["MUSECAT_ISSUER"]
                 + " "
                 + app.config["MUSECAT_WEB_ORIGIN"],

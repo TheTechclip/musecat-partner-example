@@ -1,0 +1,199 @@
+{
+  "spec": "musecat-records/v1",
+  "service": "chunithm",
+  "sub": "sample:player",
+  "visibility": "public",
+  "updated_at": "2026-10-19T14:39:20Z",
+  "source": {
+    "name": "Musecat Partner Example · synthetic data",
+    "url": "https://partner.example"
+  },
+  "fields": [
+    {
+      "key": "rating",
+      "label": {
+        "ko": "데모 레이팅",
+        "en": "Demo rating",
+        "ja": "デモレーティング"
+      },
+      "type": "decimal",
+      "value": 16.42,
+      "precision": 2
+    },
+    {
+      "key": "rating_max",
+      "label": {
+        "en": "Demo max rating",
+        "ko": "데모 최고 레이팅",
+        "ja": "デモ最高レーティング"
+      },
+      "type": "decimal",
+      "value": 16.58
+    },
+    {
+      "key": "over_power",
+      "label": {
+        "en": "Demo OVER POWER",
+        "ko": "데모 OVER POWER",
+        "ja": "デモ OVER POWER"
+      },
+      "type": "decimal",
+      "value": 12345.67
+    },
+    {
+      "key": "played_chart_count",
+      "label": {
+        "en": "Demo played charts",
+        "ko": "데모 플레이한 보면",
+        "ja": "デモプレイ譜面数"
+      },
+      "type": "integer",
+      "value": 123
+    },
+    {
+      "key": "full_combo_count",
+      "label": {
+        "en": "Demo FULL COMBO",
+        "ko": "데모 FULL COMBO",
+        "ja": "デモ FULL COMBO"
+      },
+      "type": "integer",
+      "value": 80
+    },
+    {
+      "key": "all_justice_count",
+      "label": {
+        "en": "Demo ALL JUSTICE",
+        "ko": "데모 ALL JUSTICE",
+        "ja": "デモ ALL JUSTICE"
+      },
+      "type": "integer",
+      "value": 30
+    },
+    {
+      "key": "last_played_at",
+      "label": {
+        "en": "Demo last played",
+        "ko": "데모 마지막 플레이",
+        "ja": "デモ最終プレイ"
+      },
+      "type": "datetime",
+      "value": "2026-10-19T01:00:00Z"
+    },
+    {
+      "key": "last_synced_at",
+      "label": {
+        "en": "Demo last synced",
+        "ko": "데모 마지막 동기화",
+        "ja": "デモ最終同期"
+      },
+      "type": "datetime",
+      "value": "2026-10-19T14:39:20Z"
+    }
+  ],
+  "player": {
+    "name": "Demo Player",
+    "title": "Synthetic CHUNITHM records",
+    "level": 85,
+    "team": "Musecat Demo"
+  },
+  "sections": [
+    {
+      "key": "rank_distribution",
+      "label": {
+        "ko": "가상 랭크 분포",
+        "en": "Synthetic rank distribution",
+        "ja": "架空のランク分布"
+      },
+      "columns": [
+        {
+          "key": "rank",
+          "label": {
+            "en": "Rank",
+            "ko": "랭크",
+            "ja": "ランク"
+          },
+          "type": "rank"
+        },
+        {
+          "key": "count",
+          "label": {
+            "en": "Charts",
+            "ko": "보면",
+            "ja": "譜面"
+          },
+          "type": "integer"
+        }
+      ],
+      "rows": [
+        [
+          "SSS+",
+          30
+        ],
+        [
+          "SSS",
+          28
+        ],
+        [
+          "SS+",
+          25
+        ],
+        [
+          "SS",
+          20
+        ],
+        [
+          "S+",
+          12
+        ],
+        [
+          "S",
+          8
+        ]
+      ]
+    }
+  ],
+  "game_schema": "musecat-game/chunithm/v1",
+  "recent_plays": {
+    "plays": [
+      {
+        "id": "synthetic-chunithm-1",
+        "played_at": "2026-10-19T01:00:00Z",
+        "song": {
+          "id": "sample:song-1",
+          "title": "Synthetic song",
+          "artist": "Example artist"
+        },
+        "chart": {
+          "id": "sample:chart-1",
+          "difficulty": "MASTER",
+          "mode": "standard"
+        },
+        "fields": [
+          {
+            "key": "score",
+            "label": {
+              "en": "Score",
+              "ko": "Score",
+              "ja": "Score"
+            },
+            "type": "integer",
+            "value": 1009876
+          },
+          {
+            "key": "clear_lamp",
+            "label": {
+              "en": "Clear lamp",
+              "ko": "Clear lamp",
+              "ja": "Clear lamp"
+            },
+            "type": "string",
+            "value": "AJ"
+          }
+        ]
+      }
+    ],
+    "total": 1
+  },
+  "selection": []
+}

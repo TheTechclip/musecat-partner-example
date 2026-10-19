@@ -1,6 +1,6 @@
 <section aria-labelledby="oidc-title"><h2 id="oidc-title">{{ t('oidc_title') }}</h2><p>{{ t('oidc_hint') }}</p>
 {% if g.oidc_login %}
-<p class="status">{{ t('oidc_account', name=g.oidc_login.name) }}</p><p>{{ t('oidc_expiry') }}</p>
+{% if g.oidc_login.picture %}<img class="avatar" src="{{ g.oidc_login.picture }}" alt="{{ t('profile_image') }}" referrerpolicy="no-referrer">{% endif %}<p class="status">{{ t('oidc_account', name=g.oidc_login.name) }}</p><p>{{ t('oidc_expiry') }}</p>
 <form action="/oidc/nearby" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button>{{ t('oidc_nearby') }}</button></form>
 <form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form>
 {% else %}

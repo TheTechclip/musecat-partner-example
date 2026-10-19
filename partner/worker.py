@@ -15,7 +15,14 @@ def deliver(app):
             if job["next"] > now():
                 continue
             try:
-                if job["kind"] == "joint":
+                if job["kind"] == "records":
+                    remote(
+                        "POST",
+                        "/partner/v1/records/invalidate",
+                        dict(job["body"]),
+                        joint=True,
+                    )
+                elif job["kind"] == "joint":
                     result = remote(
                         "POST",
                         "/partner/v1/revocations",

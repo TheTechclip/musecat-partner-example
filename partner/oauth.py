@@ -28,12 +28,12 @@ from .common import (
     reject_duplicates,
     require_csrf,
     require_user,
-    stamp,
     token_grant,
     user,
     valid_challenge,
 )
 from .storage import digest
+from .record_examples import SERVICES
 
 bp = Blueprint("oauth", __name__)
 
@@ -220,7 +220,7 @@ def userinfo():
         sub="sample:" + grant["user"],
         iss=current_app.config["PARTNER_ORIGIN"],
         name="Demo " + grant["user"].title(),
-        services=["chunithm"],
+        services=[game for game in SERVICES if game + ":read" in grant["scopes"]],
     )
 
 
@@ -228,135 +228,16 @@ def userinfo():
 def records(service):
     with ledger().transaction() as tx:
         grant = token_grant(tx)
-        if service != "chunithm":
+        if service not in SERVICES:
             raise ProtocolError("unsupported_service", 404)
-        if "chunithm:read" not in grant["scopes"]:
+        if service + ":read" not in grant["scopes"]:
             raise ProtocolError("insufficient_scope", 403)
         if ledger().get(tx, "private", grant["user"]):
             raise ProtocolError("records_private", 403)
-    return jsonify(
-        spec="musecat-records/v1",
-        service=service,
-        sub="sample:" + grant["user"],
-        visibility="public",
-        updated_at=stamp(),
-        source={
-            "name": "Musecat Partner Example · synthetic data",
-            "url": current_app.config["PARTNER_ORIGIN"],
-        },
-        fields=[
-            {
-                "key": "rating",
-                "label": {
-                    "ko": "데모 레이팅",
-                    "en": "Demo rating",
-                    "ja": "デモレーティング",
-                },
-                "type": "decimal",
-                "value": 16.42,
-                "precision": 2,
-            },
-            *[
-                {
-                    "key": key,
-                    "label": {"en": en, "ko": ko, "ja": ja},
-                    "type": kind,
-                    "value": value,
-                }
-                for key, en, ko, ja, kind, value in [
-                    (
-                        "rating_max",
-                        "Demo max rating",
-                        "데모 최고 레이팅",
-                        "デモ最高レーティング",
-                        "decimal",
-                        16.58,
-                    ),
-                    (
-                        "over_power",
-                        "Demo OVER POWER",
-                        "데모 OVER POWER",
-                        "デモ OVER POWER",
-                        "decimal",
-                        12345.67,
-                    ),
-                    (
-                        "played_chart_count",
-                        "Demo played charts",
-                        "데모 플레이한 보면",
-                        "デモプレイ譜面数",
-                        "integer",
-                        123,
-                    ),
-                    (
-                        "full_combo_count",
-                        "Demo FULL COMBO",
-                        "데모 FULL COMBO",
-                        "デモ FULL COMBO",
-                        "integer",
-                        80,
-                    ),
-                    (
-                        "all_justice_count",
-                        "Demo ALL JUSTICE",
-                        "데모 ALL JUSTICE",
-                        "デモ ALL JUSTICE",
-                        "integer",
-                        30,
-                    ),
-                    (
-                        "last_played_at",
-                        "Demo last played",
-                        "데모 마지막 플레이",
-                        "デモ最終プレイ",
-                        "datetime",
-                        "2026-10-19T01:00:00Z",
-                    ),
-                    (
-                        "last_synced_at",
-                        "Demo last synced",
-                        "데모 마지막 동기화",
-                        "デモ最終同期",
-                        "datetime",
-                        stamp(),
-                    ),
-                ]
-            ],
-        ],
-        player={
-            "name": "Demo " + grant["user"].title(),
-            "title": "Synthetic CHUNITHM records",
-            "level": 85,
-            "team": "Musecat Demo",
-        },
-        sections=[
-            {
-                "key": "rank_distribution",
-                "label": {
-                    "ko": "가상 랭크 분포",
-                    "en": "Synthetic rank distribution",
-                    "ja": "架空のランク分布",
-                },
-                "columns": [
-                    {
-                        "key": "rank",
-                        "label": {"en": "Rank", "ko": "랭크", "ja": "ランク"},
-                        "type": "rank",
-                    },
-                    {
-                        "key": "count",
-                        "label": {"en": "Charts", "ko": "보면", "ja": "譜面"},
-                        "type": "integer",
-                    },
-                ],
-                "rows": [
-                    ["SSS+", 30],
-                    ["SSS", 28],
-                    ["SS+", 25],
-                    ["SS", 20],
-                    ["S+", 12],
-                    ["S", 8],
-                ],
-            }
-        ],
-    )
+    from .record_examples import envelope
+
+    with ledger().transaction() as tx:
+        excluded = (
+            ledger().get(tx, "record_selection", grant["user"] + ":" + service) or []
+        )
+    return jsonify(envelope(service, grant["user"], excluded))
