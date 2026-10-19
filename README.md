@@ -214,6 +214,12 @@ The Musecat specification above is authoritative. Dependency information: [Flask
 
 The synthetic response includes `rating`, `rating_max`, `over_power`, `played_chart_count`, `full_combo_count`, `all_justice_count`, `last_played_at`, and `last_synced_at`. The `rank_distribution` section has a `rank` column (type `rank`) and `count` column (type `integer`). Musecat can map these optional keys to its CHUNITHM rating, achievement, and rank UI. `played_chart_count` counts distinct charts; it is not a play count. Unknown values should be omitted, not filled with zero. The transport remains `musecat-records/v1`; these keys do not create another synchronization API. The source remains explicitly synthetic.
 
+## Interactive arcade and campaign actions
+
+Open `/account-actions` after connecting Musecat with `account:access`. Load an arcade by ID, then use the dedicated forms to edit its basic information, report a cabinet fault, or participate in a version-update campaign. Each submission shows the actual HTTP status and response; mutations require a deliberate submit and are never retried automatically.
+
+Use a Preview test arcade and campaign supplied by the operator, not a real venue. The page accepts `arcade`, `campaign`, `game_id`, `lat`, and `lon` query parameters to prefill a test scenario. `game_id` is the arcade's stable cabinet entry ID, not a game catalog version ID. Campaign participation requires a same-day verified visit: expand **Verify a test visit first** and submit the synthetic fixture coordinates. Never substitute fixture coordinates for a real visit. Private/closed arcades, missing visits, stale revisions, and insufficient permissions remain subject to Musecat's normal API checks. The UI includes recovery guidance and the refreshed source responses.
+
 ## Complete Developer API examples
 
 After demo sign-in, open **Developer API examples** at `/api-examples`. The bundled official Developer OpenAPI contains **104 operations across 92 paths**, including all documented request content types. Each entry includes parameters, required scopes, editable request fields, generated response examples, the original response contract, and a curl command with environment-variable placeholders. The snapshot contains no application credentials or test-account data.

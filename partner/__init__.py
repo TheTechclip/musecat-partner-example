@@ -126,7 +126,7 @@ def create_app(overrides=None):
         )
         return response
 
-    from . import oauth, joint, web, client, explorer, oidc
+    from . import account_actions, client, explorer, joint, oauth, oidc, web
 
     app.register_blueprint(oauth.bp)
     app.register_blueprint(joint.bp)
@@ -134,4 +134,5 @@ def create_app(overrides=None):
     app.register_blueprint(client.bp)
     app.register_blueprint(explorer.bp)
     app.register_blueprint(oidc.bp)
+    app.register_blueprint(account_actions.bp)
     return app

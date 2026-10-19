@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="{{ locale }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ title }} · Musecat Partner Example</title><link rel="stylesheet" href="/static/style.css"></head>
+<html lang="{{ locale }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ title or t('actions_title') }} · Musecat Partner Example</title><link rel="stylesheet" href="/static/style.css"></head>
 <body><main>
-<form class="language" action="/language" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="next" value="{{ request.full_path if request.path == '/api-examples' else '/' }}"><label for="locale">{{ t('language') }}</label><select id="locale" name="locale">{% for code, name in languages.items() %}<option value="{{ code }}" {% if code == locale %}selected{% endif %}>{{ name }}</option>{% endfor %}</select><button class="secondary">{{ t('apply') }}</button></form>
-<p class="eyebrow">MUSECAT · DEVELOPER SAMPLE</p><h1>{{ title }}</h1><p><a href="/">{{ t('back') }}</a> · <a href="/api-examples">{{ t('api_console') }}</a></p>
+<form class="language" action="/language" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="next" value="{{ request.full_path if request.path in ['/api-examples', '/account-actions'] else '/' }}"><label for="locale">{{ t('language') }}</label><select id="locale" name="locale">{% for code, name in languages.items() %}<option value="{{ code }}" {% if code == locale %}selected{% endif %}>{{ name }}</option>{% endfor %}</select><button class="secondary">{{ t('apply') }}</button></form>
+<p class="eyebrow">MUSECAT · DEVELOPER SAMPLE</p><h1>{{ title or t('actions_title') }}</h1><p><a href="/">{{ t('back') }}</a> · <a href="/api-examples">{{ t('api_console') }}</a></p>
 {% block content %}{% endblock %}
 <footer>Python + Flask + SQLite · Musecat Partner Example</footer>
 </main></body></html>

@@ -215,7 +215,7 @@ def language():
         or parsed.scheme
         or parsed.netloc
         or parsed.fragment
-        or parsed.path not in ("/", "/login", "/oauth/authorize", "/api-examples")
+        or parsed.path not in ("/", "/login", "/oauth/authorize", "/api-examples", "/account-actions")
     ):
         raise ProtocolError("invalid_request")
     session["locale"] = selected

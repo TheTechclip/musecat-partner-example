@@ -46,6 +46,7 @@
   {% endif %}
   <section><h2>{{ t('registration') }}</h2><p>{{ t('registration_policy') }}</p><p>{{ t('registration_hint') }}</p><div class="actions"><a href="/onboarding.json">{{ t('onboarding') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/developer" rel="noreferrer">{{ t('developer_center') }}</a><a href="{{ musecat_web }}/api/developer/spec" rel="noreferrer">{{ t('spec') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/settings/connections" rel="noreferrer">{{ t('start_musecat') }}</a></div></section>
   {% endif %}
+  <p><a class="button" href="/account-actions">{{ t('actions_title') }}</a></p>
   <p><a class="button secondary" href="/api-examples">{{ t('api_console') }}</a></p>
   {% if mode != 'authorize' %}{% include 'oidc-panel.html' %}{% endif %}
   <footer>Python + Flask + SQLite · Musecat Partner Example</footer>

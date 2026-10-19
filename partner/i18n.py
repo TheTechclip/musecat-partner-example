@@ -517,5 +517,192 @@ def init_i18n(app):
     )
 
 
+MESSAGES.update(
+    {
+        "actions_title": {
+            "en": "Try account actions",
+            "ko": "계정 권한으로 직접 체험",
+            "ja": "アカウント権限で操作を試す",
+        },
+        "actions_intro": {
+            "en": "Edit arcade information, report a faulty machine and participate in campaigns using your connected Musecat account. Requires account:access consent.",
+            "ko": "연결한 뮤즈캣 계정으로 오락실 정보를 수정하고 고장 신고와 캠페인 참여를 직접 해보세요. account:access 동의가 필요합니다.",
+            "ja": "連携した Musecat アカウントで店舗情報の編集・故障報告・キャンペーン参加を試せます。account:access への同意が必要です。",
+        },
+        "actions_test_notice": {
+            "en": "These buttons write real data to the configured Musecat server. Use designated synthetic test arcades only. Account level, ownership and location rules still apply. Mutations are never retried automatically.",
+            "ko": "버튼을 누르면 설정된 뮤즈캣 서버에 실제 데이터가 저장됩니다. 지정된 가상 테스트 오락실만 사용하세요. 계정 레벨·소유권·위치 규칙이 그대로 적용되며 쓰기 요청을 자동 재시도하지 않습니다.",
+            "ja": "ボタンは設定先の Musecat に実データを保存します。指定された架空のテスト店舗だけを使用してください。レベル・所有権・位置の規則はそのまま適用され、書き込みは自動再試行しません。",
+        },
+        "actions_target": {
+            "en": "Choose a test arcade",
+            "ko": "테스트 오락실 선택",
+            "ja": "テスト店舗を選択",
+        },
+        "actions_arcade_id": {
+            "en": "Test arcade ID",
+            "ko": "테스트 오락실 ID",
+            "ja": "テスト店舗 ID",
+        },
+        "actions_load": {
+            "en": "Load current information",
+            "ko": "현재 정보 불러오기",
+            "ja": "現在の情報を取得",
+        },
+        "actions_response": {
+            "en": "Actual Musecat response",
+            "ko": "실제 뮤즈캣 응답",
+            "ja": "Musecat の実際の応答",
+        },
+        "actions_recovery": {
+            "en": "401: reconnect. 403: check your level, consent and same-day visit; supplied coordinates must be within 100 m. 404: check the test ID and public/open state. 409: reload current data and campaign eligibility before submitting again. 429: wait. After a network failure, read the current state before deciding whether to resubmit.",
+            "ko": "401: 다시 연결하세요. 403: 레벨·동의·당일 방문을 확인하세요. 제출 좌표는 오락실 100m 이내여야 합니다. 404: 테스트 ID와 공개·영업 상태를 확인하세요. 409: 최신 정보와 캠페인 참여 조건을 다시 조회하세요. 429: 기다리세요. 네트워크 실패 후에는 재전송 전에 현재 상태를 먼저 확인하세요.",
+            "ja": "401: 再連携してください。403: レベル・同意・当日の訪問を確認してください。座標は店舗の 100 m 以内である必要があります。404: ID と公開・営業状態を確認してください。409: 最新情報とキャンペーン条件を再取得してください。429: 待ってください。通信失敗後は再送前に現在の状態を確認してください。",
+        },
+        "actions_saved": {
+            "en": "Request completed. Current information was reloaded below.",
+            "ko": "요청을 완료했습니다. 아래에 현재 정보를 다시 불러왔습니다.",
+            "ja": "リクエストが完了しました。以下に現在の情報を再取得しました。",
+        },
+        "actions_basic": {
+            "en": "Edit basic information",
+            "ko": "오락실 기본 정보 수정",
+            "ja": "店舗の基本情報を編集",
+        },
+        "actions_basic_hint": {
+            "en": "Only name, address and directions are edited here. Coordinates, aliases and other fields are left unchanged. A stale revision is rejected.",
+            "ko": "이 폼은 이름·주소·찾아가는 길만 수정합니다. 좌표·별명 등 다른 필드는 유지하며 오래된 수정본은 거부됩니다.",
+            "ja": "このフォームは名前・住所・アクセス案内だけを編集します。座標・別名などは維持し、古いリビジョンによる変更は拒否されます。",
+        },
+        "actions_name": {"en": "Name", "ko": "이름", "ja": "名前"},
+        "actions_address": {"en": "Address", "ko": "주소", "ja": "住所"},
+        "actions_direction": {
+            "en": "Directions",
+            "ko": "찾아가는 길",
+            "ja": "アクセス案内",
+        },
+        "actions_save_basic": {
+            "en": "Save arcade information",
+            "ko": "오락실 정보 저장",
+            "ja": "店舗情報を保存",
+        },
+        "actions_fault": {
+            "en": "Report a fault",
+            "ko": "고장 신고",
+            "ja": "故障を報告",
+        },
+        "actions_game": {"en": "Machine", "ko": "게임 기기", "ja": "ゲーム筐体"},
+        "actions_choose": {
+            "en": "Choose a machine",
+            "ko": "기기를 선택하세요",
+            "ja": "筐体を選択",
+        },
+        "actions_severity": {"en": "Severity", "ko": "고장 정도", "ja": "不具合の程度"},
+        "actions_minor": {
+            "en": "Minor inconvenience",
+            "ko": "경미한 불편",
+            "ja": "軽微な不便",
+        },
+        "actions_bearable": {
+            "en": "Playable with issues",
+            "ko": "플레이 가능하나 불편",
+            "ja": "問題はあるがプレイ可能",
+        },
+        "actions_major": {"en": "Major problem", "ko": "큰 지장", "ja": "大きな支障"},
+        "actions_unplayable": {
+            "en": "Unplayable",
+            "ko": "플레이 불가",
+            "ja": "プレイ不可",
+        },
+        "actions_message": {
+            "en": "Describe the fault",
+            "ko": "고장 내용",
+            "ja": "故障の内容",
+        },
+        "actions_send_fault": {
+            "en": "Submit fault report",
+            "ko": "고장 신고 등록",
+            "ja": "故障報告を送信",
+        },
+        "actions_campaign": {
+            "en": "Participate in an update campaign",
+            "ko": "업데이트 캠페인 참여",
+            "ja": "アップデートキャンペーンに参加",
+        },
+        "actions_campaign_hint": {
+            "en": "Load eligible campaign targets, then confirm the observed version. A verified visit on the same local day is required. This example does not bypass location checks.",
+            "ko": "참여 가능한 캠페인 대상을 불러온 뒤 확인한 버전을 제출하세요. 오락실 현지 날짜 기준 당일 인증 방문이 필요합니다. 이 예제는 위치 검사를 우회하지 않습니다.",
+            "ja": "対象を取得して確認したバージョンを送信します。店舗の現地日付で当日の認証済み訪問が必要です。このサンプルは位置確認を回避しません。",
+        },
+        "actions_visit": {
+            "en": "Verify a test visit first",
+            "ko": "테스트 방문 먼저 인증",
+            "ja": "先にテスト訪問を認証",
+        },
+        "actions_visit_hint": {
+            "en": "Synthetic fixture coordinates only: entering coordinates records a real test visit and may award XP. Do not enter fabricated coordinates for real arcades. No browser location is requested.",
+            "ko": "가상 테스트 오락실의 좌표만 입력하세요. 실제 테스트 방문이 기록되고 경험치가 부여될 수 있습니다. 실제 오락실에 허위 좌표를 제출하지 마세요. 브라우저 위치를 요청하지 않습니다.",
+            "ja": "架空のテスト店舗の座標のみ使用してください。テスト訪問が実際に記録され、経験値が付与される場合があります。実店舗の偽の座標を送信しないでください。ブラウザーの位置情報は要求しません。",
+        },
+        "actions_lat": {"en": "Test latitude", "ko": "테스트 위도", "ja": "テスト緯度"},
+        "actions_lon": {
+            "en": "Test longitude",
+            "ko": "테스트 경도",
+            "ja": "テスト経度",
+        },
+        "actions_accuracy": {
+            "en": "Accuracy (meters)",
+            "ko": "정확도 (m)",
+            "ja": "精度（m）",
+        },
+        "actions_verify_visit": {
+            "en": "Record verified test visit",
+            "ko": "테스트 방문 인증 기록",
+            "ja": "テスト訪問認証を記録",
+        },
+        "actions_no_campaigns": {
+            "en": "No eligible campaign prompts for this arcade. Check the selected test arcade and active campaign.",
+            "ko": "이 오락실에 참여 가능한 캠페인이 없습니다. 테스트 오락실과 활성 캠페인을 확인하세요.",
+            "ja": "この店舗の対象キャンペーンはありません。テスト店舗と有効なキャンペーンを確認してください。",
+        },
+        "actions_campaign_id": {
+            "en": "Campaign ID",
+            "ko": "캠페인 ID",
+            "ja": "キャンペーン ID",
+        },
+        "actions_game_id": {
+            "en": "Stable machine ID",
+            "ko": "고정 게임 기기 ID",
+            "ja": "固定筐体 ID",
+        },
+        "actions_result": {
+            "en": "Observed version",
+            "ko": "확인한 버전",
+            "ja": "確認したバージョン",
+        },
+        "actions_still_old": {
+            "en": "Still on the old version",
+            "ko": "아직 이전 버전",
+            "ja": "まだ旧バージョン",
+        },
+        "actions_updated": {
+            "en": "Updated to the target version",
+            "ko": "대상 버전으로 업데이트됨",
+            "ja": "対象バージョンに更新済み",
+        },
+        "actions_submit_campaign": {
+            "en": "Submit campaign participation",
+            "ko": "캠페인 참여 제출",
+            "ja": "キャンペーン参加を送信",
+        },
+        "actions_read_results": {
+            "en": "Current information and API responses",
+            "ko": "현재 정보와 API 응답",
+            "ja": "現在の情報と API 応答",
+        },
+    }
+)
+
+
 def text(key, **values):
     return MESSAGES[key][g.locale].format(**values)
