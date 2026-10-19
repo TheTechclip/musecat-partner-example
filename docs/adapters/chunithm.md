@@ -8,6 +8,8 @@ This is Musecat's mapping contract, not an official publisher API or a claim tha
 
 日本語: Musecat 向けの記録マッピング規格です。例は架空データであり、実プロバイダー接続や公式 API を意味しません。日時・楽曲・譜面を維持し、非公開項目は送信しません。
 
+For the actual CHUNITHM Info OAuth endpoints, Preview callback, native conversion and upstream feature requests, see [CHUNITHM Info integration](chuni-info.md).
+
 ## Chart identity
 
 Preserve difficulty and mode, including special/course/world-end chart identities. Optional existing rich dashboard vocabulary remains backward compatible. IDs must be namespaced by source; a matching title alone is not sufficient to join records. Keep release/region in provider metadata or labeled custom fields when it changes interpretation.

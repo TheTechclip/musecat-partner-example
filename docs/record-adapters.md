@@ -16,6 +16,8 @@ This additive `musecat-records/v1` contract separates common transport, game voc
 
 日本語: 共通形式・ゲーム別の意味・プロバイダー拡張を分離します。最近のプレーと共有項目の除外に対応し、上記のゲーム別文書に項目と調査元を記載しています。すべて架空データで、実サイトの API 実装を代替しません。
 
+For a real provider using its own OAuth JSON rather than this envelope, see [CHUNITHM Info native adapter setup and feature requests](adapters/chuni-info.md).
+
 ## Common envelope
 
 Required: `spec`, `service`, authenticated `sub`, `visibility`, `updated_at`, source attribution, `fields` and `sections`. `sub` must equal the partner OAuth subject; Musecat removes it before storage/profile output. All partner links must be HTTPS. Labels require English and should include Korean/Japanese. Unknown values may be null; absence never means zero. Existing bounds remain 256 KiB, 24 summary fields, four tables, 50 rows/table and eight columns. Generic `percent` is 0–100; maimai's above-100 achievement uses `decimal` with a percentage label.
