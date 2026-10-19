@@ -40,7 +40,7 @@ The native adapter requests all four official scopes for the CHUNITHM service; d
 
 The adapter uses the top-level `id` as the stable account subject. It converts the authorized nested `profile`, `rating`, `stats`, and `scores` objects into the [CHUNITHM mapping](chunithm.md). Missing or unconsented data must remain absent; it must not become a zero score or a fabricated recent play. `scores.best30` is a best-record list, not a recent-play history.
 
-After saving the provider and protected credentials, connect from Musecat's **Settings → External account connections**, consent at CHUNITHM Info, then inspect the fetched records. Publication also depends on Musecat's app environment and profile visibility settings: development app records are not anonymously published. An ordinary third-party developer does not need to install Musecat or know its internal storage model.
+After saving the provider and protected credentials, connect from your Musecat profile's **CHUNITHM** tab, consent at CHUNITHM Info, then inspect the fetched records. The tab explains that connecting publishes CHUNITHM records; there is no separate publication checkbox for this native provider. Disconnect to stop sharing. Publication also depends on Musecat's app environment and profile visibility settings: development app records are not anonymously published. An ordinary third-party developer does not need to install Musecat or know its internal storage model.
 
 ## Token and webhook behavior
 
@@ -57,6 +57,7 @@ The supplied API documentation exposes profile, rating, aggregate statistics and
 - A dedicated scope (or a clearly documented existing scope), user-selected export rules, and omission of unconsented data.
 - A stable play ID and real RFC3339 `played_at` including timezone for each play, newest first. Sync time must not substitute for play time.
 - Song ID/title (artist optional), chart ID/difficulty, and level/mode/version/region where available. IDs must be stable and source-specific.
+- An optional HTTPS song cover URL, mapped to `recent_plays.plays[].song.image_url`. Omit missing artwork; Musecat supplies a placeholder.
 - Actual score, score rank, clear/FC/AJ/AJC status and available judgement counts; mark optional unavailable fields rather than inventing values.
 - At least the latest 50 authorized plays, or documented cursor pagination, ordering, retention window and rate limits. Document corrections/deletions and how clients deduplicate updates.
 - Sync/export/privacy change notifications so a cached history can be refreshed or invalidated promptly. A notification count alone is insufficient.
@@ -83,4 +84,4 @@ CHUNITHM Info would also exchange the Musecat code at Musecat's token endpoint a
 
 Suggested request to send their team:
 
-> 뮤즈캣에서 OAuth로 프로필·레이팅·통계·베스트 30을 읽는 연동을 준비 중입니다. 최근 플레이는 건수 대신 곡·채보·실제 플레이 시각·점수·성과와 안정적인 플레이 ID가 포함된 최신순 이력 API가 필요합니다(최신 50건 또는 커서 페이지네이션, 동의 스코프·전송 항목 선택·변경 알림 포함). 원클릭 양방향 연결은 별도로 `musecat-joint/v1`의 intent 조회·receipt·세대별 연결 해제와 양쪽 서버 인증을 지원할 수 있는지 협의하고 싶습니다. 기존 OAuth API만으로 최근 플레이나 공동 연결이 지원된다고 가정하지 않겠습니다.
+> 뮤즈캣에서 OAuth로 프로필·레이팅·통계·베스트 30을 읽는 연동을 준비 중입니다. 최근 플레이는 건수 대신 곡·곡 이미지 HTTPS URL·채보·실제 플레이 시각·점수·성과와 안정적인 플레이 ID가 포함된 최신순 이력 API가 필요합니다(최신 50건 또는 커서 페이지네이션, 동의 스코프·전송 항목 선택·변경 알림 포함). 원클릭 양방향 연결은 별도로 `musecat-joint/v1`의 intent 조회·receipt·세대별 연결 해제와 양쪽 서버 인증을 지원할 수 있는지 협의하고 싶습니다. 기존 OAuth API만으로 최근 플레이나 공동 연결이 지원된다고 가정하지 않겠습니다.
