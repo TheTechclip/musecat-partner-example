@@ -39,6 +39,7 @@ class RecordAdaptersTests(unittest.TestCase):
             self.assertEqual(payload["game_schema"], "musecat-game/" + game + "/v1")
             self.assertEqual(payload["sub"], "sample:alice")
             self.assertEqual(len(payload["recent_plays"]["plays"]), 1)
+            self.assertEqual(payload["recent_plays"]["plays"][0]["song"]["image_url"], ORIGIN + "/static/synthetic-song.svg")
             self.assertEqual(
                 self.http.get("/record-examples/" + game, base_url=ORIGIN).json["sub"],
                 "sample:synthetic",

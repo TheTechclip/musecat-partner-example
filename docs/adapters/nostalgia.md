@@ -47,3 +47,5 @@ Additional metrics use `provider_name.metric` keys and clear localized labels. N
 - [NosLog user visibility controls](https://noslog.app/en/privacy)
 
 NosLog documents visibility groups and partial recent-history sync. Its public pages do not establish a Musecat OAuth endpoint or user-selected export API. A real NosLog adapter must obtain that provider contract and apply both its export choices and visibility controls; never scrape private settings or fabricate all-time history from a recent window.
+
+Recent-play artwork uses the optional HTTPS `song.image_url` field. Send the actual song cover URL alongside the title, artist, chart, performance and `played_at` time. Omit unavailable artwork; the UI supplies a fallback. See the [common record contract](../record-adapters.md).

@@ -48,3 +48,5 @@ Additional metrics use `provider_name.metric` keys and clear localized labels. N
 
 - [SEGA international gameplay/achievement information](https://chunithm.sega.com/play/others.html)
 - [SEGA course scoring rules](https://maimai.sega.jp/kop3rd/chunithm/)
+
+Recent-play artwork uses the optional HTTPS `song.image_url` field. Send the actual song cover URL alongside the title, artist, chart, performance and `played_at` time. Omit unavailable artwork; the UI supplies a fallback. See the [common record contract](../record-adapters.md).

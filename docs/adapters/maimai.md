@@ -41,3 +41,5 @@ Additional metrics use `provider_name.metric` keys and clear localized labels. N
 
 - [SEGA achievement calculation notice](https://maimai.sega.jp/news/2019-08-07/)
 - [SEGA KOP7th rules distinguish achievement and DX score](https://maimai.sega.jp/kop7th/maimai/)
+
+Recent-play artwork uses the optional HTTPS `song.image_url` field. Send the actual song cover URL alongside the title, artist, chart, performance and `played_at` time. Omit unavailable artwork; the UI supplies a fallback. See the [common record contract](../record-adapters.md).

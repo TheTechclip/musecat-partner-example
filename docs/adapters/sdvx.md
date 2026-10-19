@@ -45,3 +45,5 @@ Additional metrics use `provider_name.metric` keys and clear localized labels. N
 - [KONAMI current gameplay/results guide](https://p.eagate.573.jp/game/sdvx/vii/howto/play.html)
 - [KONAMI judgement/result guide (legacy version)](https://p.eagate.573.jp/game/sdvx/sv/p/booth_howtoplay/qa.html)
 - [KONAMI mode-specific scoring example](https://p.eagate.573.jp/game/sdvx/vii/howto/megamix_battle.html)
+
+Recent-play artwork uses the optional HTTPS `song.image_url` field. Send the actual song cover URL alongside the title, artist, chart, performance and `played_at` time. Omit unavailable artwork; the UI supplies a fallback. See the [common record contract](../record-adapters.md).

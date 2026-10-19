@@ -44,3 +44,5 @@ Additional metrics use `provider_name.metric` keys and clear localized labels. N
 
 - [KONAMI saved play data: EX score and lamps](https://p.eagate.573.jp/game/2dx/26/howto/epass/play_data.html)
 - [KONAMI current result guide](https://p.eagate.573.jp/game/2dx/34/howto/play/game_start.html)
+
+Recent-play artwork uses the optional HTTPS `song.image_url` field. Send the actual song cover URL alongside the title, artist, chart, performance and `played_at` time. Omit unavailable artwork; the UI supplies a fallback. See the [common record contract](../record-adapters.md).

@@ -34,7 +34,8 @@
         "song": {
           "id": "sample:song-1",
           "title": "Synthetic song",
-          "artist": "Example artist"
+          "artist": "Example artist",
+          "image_url": "https://partner.example/static/synthetic-song.svg"
         },
         "chart": {
           "id": "sample:chart-1",

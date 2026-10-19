@@ -237,6 +237,10 @@ def envelope(service, uid="alice", excluded=()):
         ],
         "total": 1,
     }
+    # Artwork is served by this sample; localhost HTTP uses the consumer's fallback.
+    origin = current_app.config["PARTNER_ORIGIN"].rstrip("/")
+    if origin.startswith("https://"):
+        result["recent_plays"]["plays"][0]["song"]["image_url"] = origin + "/static/synthetic-song.svg"
     result["selection"] = []
     for key in excluded:
         if key in ("player", "recent_plays", "fields", "sections"):
