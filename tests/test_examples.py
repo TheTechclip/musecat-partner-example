@@ -57,6 +57,13 @@ class ApiExampleTests(unittest.TestCase):
             form={"csrf": self.case.csrf(), "operation": operation, **fields},
         )
 
+    def test_bulk_arcade_list_is_not_executable(self):
+        for path in ["/developer/v1/arcades", "/developer/v1/account/arcades"]:
+            self.assertNotIn(path, SPEC["paths"])
+            for method in ["GET", "HEAD"]:
+                response = self.run_example(method + " " + path)
+                self.assertEqual(response.status_code, 400)
+
     def test_catalog_covers_every_official_operation_and_media(self):
         expected = {
             method.upper() + " " + path
