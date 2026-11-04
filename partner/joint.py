@@ -88,7 +88,7 @@ def start_intent(correlation, return_to, completion=None):
 def partner_start():
     require_csrf()
     return start_intent(
-        str(uuid.uuid4()), consent_url("kr" if g.locale == "ko" else g.locale)
+        str(uuid.uuid4()), consent_url({"ko": "kr", "ja": "jp"}.get(g.locale, g.locale))
     )
 
 
@@ -100,7 +100,7 @@ def musecat_start():
     )
     completion = request.args.get("completion_uri")
     locales = [
-        locale for locale in ["kr", "en", "ja"] if return_to == consent_url(locale)
+        locale for locale in ["kr", "en", "jp"] if return_to == consent_url(locale)
     ]
     if (
         not uuid4(correlation)

@@ -126,7 +126,7 @@ The sample starts without Musecat-issued keys. Sign in as `alice` or `bob` using
 | Records | `<origin>/api/records/chunithm` |
 | Joint base | `<origin>/api/joint` |
 | Partner entry point when starting in Musecat | `<origin>/connect/musecat/start` |
-| Joint consent | `https://preview.musecat.app/en/connect/<PARTNER_ID>` (also `/kr/`, `/ja/`) |
+| Joint consent | `https://preview.musecat.app/en/connect/<PARTNER_ID>` (also `/kr/`, `/jp/`) |
 
 After changing environment variables:
 

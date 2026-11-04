@@ -19,7 +19,7 @@ Musecat Preview と連携する **開発・テスト用サンプル**です。Py
 | 開発環境 | URL |
 | --- | --- |
 | API / OAuth issuer | `https://db-dev.musecat.app` |
-| 開発者センター | <https://preview.musecat.app/ja/developer> |
+| 開発者センター | <https://preview.musecat.app/jp/developer> |
 | 正式な連携仕様 | <https://preview.musecat.app/api/developer/spec> |
 
 この例は権限委譲 scope `account:access` と `/developer/v1/account/*`、`/developer/v1/me` API を使用します。独立した OIDC ログインは別アプリと認証情報で `openid profile arcade:read` を要求し、`account:access` は付与しません。
@@ -126,7 +126,7 @@ Musecat 発行キーがなくてもサンプルは起動します。`.env` の `
 | 記録 | `<origin>/api/records/chunithm` |
 | Joint base | `<origin>/api/joint` |
 | Musecat から開始する際のパートナー入口 | `<origin>/connect/musecat/start` |
-| 共同同意画面 | `https://preview.musecat.app/ja/connect/<PARTNER_ID>` (`/kr/`, `/en/` も対応) |
+| 共同同意画面 | `https://preview.musecat.app/jp/connect/<PARTNER_ID>` (`/kr/`, `/en/` も対応) |
 
 環境変数を変更した後は再作成します。
 
