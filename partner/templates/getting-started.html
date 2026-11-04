@@ -1,0 +1,27 @@
+<section id="prepare" aria-labelledby="prepare-title">
+  <h2 id="prepare-title">{{ t('prepare_title') }}</h2>
+  <p>{{ t('prepare_intro') }}</p>
+  {% for flow in ['login', 'a', 'b', 'joint'] %}
+  <details>
+    <summary>{{ t('goal_' + flow) }}</summary>
+    <p>{{ t('purpose_' + flow) }}</p>
+    <p>{{ t('host_' + ('local' if flow in ['login', 'a'] else 'public')) }}</p>
+    <p>{{ t('keys_' + flow) }}</p>
+    <p>{{ t('success_' + flow) }}</p>
+    <a href="/onboarding.json?flow={{ flow }}">{{ t('deployed_json') }}</a>
+  </details>
+  {% endfor %}
+  <ol>
+    <li><a href="https://github.com/TheTechclip/musecat-partner-example/tree/code/pr99-example-integration">{{ t('source_code') }}</a> — <a href="https://github.com/TheTechclip/musecat-partner-example/blob/code/pr99-example-integration/docs/local-development.md">{{ t('local_quickstart') }}</a>. {{ t('prepare_run') }}</li>
+    <li>{{ t('prepare_json') }}</li>
+    <li><a href="{{ musecat_web }}/{{ musecat_locale }}/developer/apps" rel="noreferrer">{{ t('developer_center') }}</a>: {{ t('prepare_register') }}</li>
+    <li>{{ t('prepare_keys') }}</li>
+    <li>{{ t('prepare_verify') }}</li>
+  </ol>
+  <p class="notice">{{ t('json_boundary') }}</p>
+  <details><summary>{{ t('troubleshoot_title') }}</summary><ul>
+    <li>{{ t('troubleshoot_tester') }}</li>
+    <li>{{ t('troubleshoot_credentials') }}</li>
+    <li>{{ t('troubleshoot_records') }}</li>
+  </ul><a href="{{ musecat_web }}/api/developer/spec" rel="noreferrer">{{ t('spec') }}</a></details>
+</section>

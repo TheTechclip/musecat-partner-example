@@ -3,7 +3,7 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ t('title') }} · Musecat Partner Example</title><link rel="stylesheet" href="/static/style.css"></head>
 <body><main>
   <form class="language" action="/language" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}"><label for="locale">{{ t('language') }}</label><select id="locale" name="locale">{% for code, name in languages.items() %}<option value="{{ code }}" {% if code == locale %}selected{% endif %}>{{ name }}</option>{% endfor %}</select><button class="secondary">{{ t('apply') }}</button></form>
-  <p class="eyebrow">MUSECAT · DEVELOPER SAMPLE</p>
+  <p class="eyebrow">Musecat Developer Sample</p>
   <h1>{{ t('title') }}</h1>
   <p class="muted">{{ t('subtitle') }}</p>
   {% if mode == 'login' %}
@@ -15,7 +15,11 @@
     <form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">{% for key,value in fields.items() %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}<div class="actions"><button name="decision" value="approve">{{ t('approve') }}</button><button class="secondary" name="decision" value="deny">{{ t('cancel') }}</button></div></form>
   </section>
   {% else %}
-  {% if not user %}<section><h2>{{ t('get_started') }}</h2><p>{{ t('get_started_hint') }}</p><a class="button" href="/login">{{ t('open_login') }}</a></section>
+  <nav class="actions" aria-label="{{ t('start_navigation') }}"><a href="#prepare">{{ t('prepare_title') }}</a><a href="#try-demo">{{ t('try_demo') }}</a></nav>
+  {% include 'getting-started.html' %}
+  <h2 id="try-demo">{{ t('try_demo') }}</h2>
+  <p>{{ t('demo_access') }}</p>
+  {% if not user %}<p><a class="button" href="/login">{{ t('open_login') }}</a></p>
   {% else %}
   <section><div class="heading"><h2>{{ t('oidc_account', name=oidc_login.name) if oidc_login else t('demo_name', name=user|title) }}</h2><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('sign_out') }}</button></form></div>
     {% if link %}<p class="status">{{ t('partial' if link.partial else 'connected') }}</p><p>{{ t('joint_mode' if link.pair_id else 'oneway_mode') }}</p><p>Musecat: {{ link.name }}</p>{% if link.picture %}<img class="avatar" src="{{ link.picture }}" alt="{{ t('profile_image') }}" referrerpolicy="no-referrer">{% endif %}<p class="muted">{{ link.sub }}</p>
@@ -44,10 +48,9 @@
   {% for game in services %}<details><summary>{{ game }}</summary><p><a href="/record-examples/{{ game }}">{{ t('synthetic_json') }}</a></p><form action="/records/selection" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="service" value="{{ game }}">{% for key in ['player','fields','sections','recent_plays'] %}<label><input type="checkbox" name="excluded" value="{{ key }}" {% if key in selections[game] %}checked{% endif %}>{{ t('exclude_' + key) }}</label>{% endfor %}<button class="secondary">{{ t('apply') }}</button></form></details>{% endfor %}</section>
   <section><h2>{{ t('refresh_test') }}</h2><p>{{ t('refresh_hint') }}</p><form action="/testing/expire-access" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="secondary">{{ t('expire') }}</button></form></section>
   {% endif %}
-  <section><h2>{{ t('registration') }}</h2><p>{{ t('registration_policy') }}</p><p>{{ t('registration_hint') }}</p><div class="actions"><a href="/onboarding.json">{{ t('onboarding') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/developer" rel="noreferrer">{{ t('developer_center') }}</a><a href="{{ musecat_web }}/api/developer/spec" rel="noreferrer">{{ t('spec') }}</a><a href="{{ musecat_web }}/{{ musecat_locale }}/settings/connections" rel="noreferrer">{{ t('start_musecat') }}</a></div></section>
   {% endif %}
-  <p><a class="button" href="/account-actions">{{ t('actions_title') }}</a></p>
-  <p><a class="button secondary" href="/api-examples">{{ t('api_console') }}</a></p>
+  {% if user %}<p><a class="button" href="/account-actions">{{ t('actions_title') }}</a></p>
+  <p><a class="button secondary" href="/api-examples">{{ t('api_console') }}</a></p>{% endif %}
   {% if mode != 'authorize' %}{% include 'oidc-panel.html' %}{% endif %}
   <footer>Python + Flask + SQLite · Musecat Partner Example</footer>
 </main></body></html>

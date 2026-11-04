@@ -22,13 +22,15 @@ with Docker Compose and optional Caddy HTTPS. MIT licensed.
 - 양쪽 교환 및 뮤즈캣 상태 확인 후에만 완료 표시, 불완전한 연결은 부분 연결로 표시
 - 양쪽에서 해제, 세대가 다른 해제 요청 격리, 재연결, 영속 outbox 재시도
 
-고정 개발 환경:
+로컬 샘플의 기본 연결 환경:
 
 | 항목 | 주소 |
 | --- | --- |
 | Musecat API / OAuth issuer | `https://db-dev.musecat.app` |
 | 웹 / 개발자 센터 | <https://preview.musecat.app/kr/developer> |
 | 최신 연동 계약 | <https://preview.musecat.app/api/developer/spec> |
+
+[배포된 예제](https://example-app.musecat.app)는 격리된 뮤즈캣 환경을 사용할 수 있으므로 해당 배포를 시험할 때는 화면의 개발자 센터와 연동 스펙 링크를 따르세요. 직접 연동하려면 샘플을 별도로 실행하고 생성된 앱 ID와 URL로 등록하세요. 공개 예제의 JSON을 본인 앱으로 등록하지 마세요. `MUSECAT_ISSUER`와 `MUSECAT_WEB_ORIGIN`은 같은 환경의 백엔드와 프론트엔드를 가리켜야 하며 등록과 자격증명은 해당 환경에서만 사용합니다.
 
 샘플은 일반 기능 위임 scope `account:access`와 `/developer/v1/account/*`, `/developer/v1/me` API를 사용합니다.
 별도의 OIDC 로그인은 독립 앱과 자격증명으로 `openid profile arcade:read`를 요청하며, `account:access`를 부여하지 않습니다.
@@ -37,16 +39,16 @@ with Docker Compose and optional Caddy HTTPS. MIT licensed.
 
 아래 방향은 **데이터 접근 방향**이며 어느 사이트에서 시작하는지와 다릅니다.
 
-| 목적 | 시작 위치 | 등록 JSON | 예제에 필요한 뮤즈캣 발급 시크릿 |
+| 목적 | 시작 위치 | 등록 JSON | 예제에 필요한 뮤즈캣 발급 시크릿/키 |
 | --- | --- | --- | --- |
 | 뮤즈캣 계정으로 로그인 | 홈 → **뮤즈캣으로 로그인** | `/onboarding.json?flow=login` | 별도 `MUSECAT_LOGIN_CLIENT_SECRET`, ID는 `MUSECAT_LOGIN_CLIENT_ID` |
 | 예제에서 뮤즈캣 프로필/API 조회 (A만) | 데모 로그인 → **뮤즈캣 정보만 연결** | `/onboarding.json?flow=a` | `MUSECAT_CLIENT_SECRET` |
-| 뮤즈캣에서 예제 전적 조회 (B만) | 뮤즈캣 설정 → 일반 외부 계정 연결 → 예제의 CHUNITHM 선택 → 연결 | `/onboarding.json?flow=b` | 없음. 생성된 파트너 OAuth ID/시크릿을 뮤즈캣에 설정 |
+| 뮤즈캣에서 예제 전적 조회 (B만) | 뮤즈캣 설정 → 일반 외부 계정 연결 → 예제의 CHUNITHM 선택 → 연결 | `/onboarding.json?flow=b` | 전적 캐시 무효화용 `PARTNER_TO_MUSECAT_KEY`. 생성된 파트너 OAuth ID/시크릿도 뮤즈캣에 설정 |
 | 통합 동의로 양방향 연결 | 어느 서비스에서든 **원클릭 양방향 연결** | `/onboarding.json?flow=joint` (기본값) | `MUSECAT_CLIENT_SECRET`, `PARTNER_TO_MUSECAT_KEY`. 생성된 파트너 OAuth 정보와 `MUSECAT_TO_PARTNER_KEY`도 뮤즈캣에 전달 |
 
-모든 모드는 로컬 세션·암호화·데모 계정용 생성 값을 사용합니다. 사용하지 않는 모드의 생성 키는 `.env`에 두어도 되며 교환할 필요가 없습니다. 앱 등록과 정확한 콜백 등록은 공통입니다. **B 전용 앱을 등록할 수 있습니다.** `/onboarding.json?flow=b`는 `direction_a`를 완전히 생략합니다. 개발자 센터에서 A를 끄고 B만 선언하면 A 콜백·뮤즈캣 발급 A 시크릿·Joint 키가 필요하지 않습니다. 이미 전체 기능으로 등록된 앱은 등록 변경 없이 세 버튼을 독립적으로 시험할 수 있습니다. 모드를 바꿀 때마다 세 JSON을 번갈아 제출하지 마세요. 등록된 설정을 변경하면 기존 동의가 무효화될 수 있습니다.
+모든 모드는 로컬 세션·암호화·데모 계정용 생성 값을 사용합니다. 사용하지 않는 모드의 생성 키는 `.env`에 두어도 되며 교환할 필요가 없습니다. 앱 등록과 정확한 콜백 등록은 공통입니다. **B 전용 앱을 등록할 수 있습니다.** `/onboarding.json?flow=b`는 등록 계약에 맞춰 `direction_a: {"redirect_uris": [], "login_enabled": false}`로 A를 비활성화합니다. 개발자 센터에서 A를 끄고 B만 선언하면 A 콜백, 뮤즈캣 발급 A 시크릿과 파트너 발급 Joint 키가 필요하지 않습니다. 다만 전적 공개 상태나 선택 항목을 바꾸려면 뮤즈캣의 전적 캐시 무효화 서버 키를 발급받아 `PARTNER_TO_MUSECAT_KEY`에 설정해야 합니다. 이미 전체 기능으로 등록된 앱은 등록 변경 없이 세 버튼을 독립적으로 시험할 수 있습니다. 모드를 바꿀 때마다 세 JSON을 번갈아 제출하지 마세요. 등록된 설정을 변경하면 기존 동의가 무효화될 수 있습니다.
 
-A의 성공 기준은 예제에 **단방향 뮤즈캣 API 연결**이 표시되고 공개 프로필을 조회하는 것입니다. `account:access`에는 문서화된 일반 사용자 쓰기 기능도 포함되며 읽기 전용 scope나 OIDC 로그인이 아닙니다. B는 뮤즈캣에 계정이 연결되고 가상 전적을 조회하면 성공입니다. **프로필 공개는 별도로 켜고** 공개 프로필에서 확인하세요. 예제의 동의 건수는 토큰 교환을 마친 접근 권한이며, 뮤즈캣의 캐시·실제 프로필 표시 상태를 증명하지는 않습니다. B만 연결한 계정의 해제는 뮤즈캣 설정에서 합니다. A만 해제해도 별도로 만든 B 권한은 유지됩니다. 독립 동의 두 개가 자동으로 공동 연결이 되지는 않습니다.
+A의 성공 기준은 예제에 **단방향 뮤즈캣 API 연결**이 표시되고 공개 프로필을 조회하는 것입니다. `account:access`에는 문서화된 일반 사용자 쓰기 기능도 포함되며 읽기 전용 scope나 OIDC 로그인이 아닙니다. B는 뮤즈캣에 계정이 연결되고 가상 전적을 조회하면 성공입니다. 개발 앱의 전적은 소유자와 테스트 사용자에게만 표시되며 익명 프로필에는 공개되지 않습니다. 실서비스 승인 후 **프로필 공개를 별도로 켜고** 공개 프로필에서 확인하세요. 예제의 동의 건수는 토큰 교환을 마친 접근 권한이며, 뮤즈캣의 캐시·실제 프로필 표시 상태를 증명하지는 않습니다. B만 연결한 계정의 해제는 뮤즈캣 설정에서 합니다. A만 해제해도 별도로 만든 B 권한은 유지됩니다. 독립 동의 두 개가 자동으로 공동 연결이 되지는 않습니다.
 
 Alice의 데모를 유지하며 다른 모드를 시험하려면 `bob`을 사용하세요. 다만 뮤즈캣의 계정 중복 연결 규칙은 그대로 적용되므로 같은 뮤즈캣 계정을 충돌하는 데모 계정에 승인하지 마세요. 계정 변경은 기존 연결을 의도적으로 해제한 뒤 진행하세요. 별도의 **뮤즈캣으로 로그인**은 아래 절차로 구현되어 있습니다. Alice의 등록된 A/B/Joint 앱을 수정하지 말고 로그인 앱을 따로 등록하세요. 설정 변경 승인으로 기존 grant가 무효화될 수 있습니다.
 
@@ -56,7 +58,7 @@ Alice의 데모를 유지하며 다른 모드를 시험하려면 `bob`을 사용
 | --- | --- |
 | A 버튼이 비활성화됨 | 등록된 앱의 Client Secret을 `MUSECAT_CLIENT_SECRET`에 설정. 양방향 키 교환은 불필요 |
 | 뮤즈캣에 제공자가 없음 | 개발자 센터의 앱 등록, 등록된 B 선언, 파트너 OAuth credential 확인 |
-| `invalid_origin` | 정확한 HTTPS `PARTNER_ORIGIN`으로 접속. 터널 변경 시 origin·승인 URL을 바꾸고 컨테이너 재생성 |
+| `invalid_origin` | 설정한 정확한 `PARTNER_ORIGIN`으로 접속. 로컬 A/OIDC는 HTTP localhost, B/Joint는 HTTPS 사용. 터널 변경 시 origin·승인 URL을 바꾸고 컨테이너 재생성 |
 | `invalid_client` 또는 콜백 거부 | 키 발급 주체와 방향, 등록한 콜백의 정확한 일치 확인 |
 | `invalid_grant`·잘못된 state·만료 | 같은 브라우저 세션에서 새로 시작. 콜백·코드 재사용 금지. refresh 소모 후에는 재연결 |
 | `records_private` 또는 프로필에 전적 없음 | 예제 공개 상태, 뮤즈캣 서비스 공개 스위치, 캐시 상태·새로고침 제한 확인 |
@@ -65,11 +67,10 @@ Alice의 데모를 유지하며 다른 모드를 시험하려면 `bob`을 사용
 
 ## 1. 로컬 실행 준비
 
-Docker Compose, Python 3, 공개 HTTPS 주소가 필요합니다. Musecat은 파트너 서버를 직접
-호출하므로 `localhost` 주소만으로는 등록할 수 없습니다.
+Docker Compose와 초기화용 Python 3가 필요합니다. 개발용 A/OIDC는 HTTP localhost 콜백으로 연결할 수 있습니다. B/Joint는 뮤즈캣이 파트너 서버를 직접 호출하므로 공개 HTTPS 주소가 필요합니다.
 
 ```sh
-git clone https://github.com/TheTechclip/musecat-partner-example.git
+git clone --branch code/pr99-example-integration https://github.com/TheTechclip/musecat-partner-example.git
 cd musecat-partner-example
 python3 scripts/init-env.py
 ```
@@ -77,7 +78,11 @@ python3 scripts/init-env.py
 `.env`에는 무작위 데모 비밀번호·세션 키·암호화 키·파트너 발급 키가 생성됩니다.
 기존 값을 덮어쓰지 않습니다. `.env`는 Git과 Docker 빌드 컨텍스트에서 제외됩니다.
 
-### 선택 A: 로컬 + 임시 HTTPS 터널
+### A/OIDC: 터널 없이 localhost 사용
+
+`.env`에 `PARTNER_ORIGIN=http://localhost:8088`을 설정하고 `docker compose up -d --build`를 실행한 뒤 해당 주소로 접속하세요. `?flow=a` 또는 `?flow=login`으로 등록하고 아래 절차에 따라 해당 앱의 시크릿을 설정한 뒤 컨테이너를 재생성합니다. 터널은 필요하지 않습니다. [로컬 개발 안내](docs/local-development.md)를 참고하세요.
+
+### B/Joint: 로컬 + 임시 HTTPS 터널
 
 별도 터미널에서 [Cloudflare Quick Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)을 실행합니다.
 
@@ -97,7 +102,7 @@ docker compose ps
 issuer와 콜백도 바뀌므로 기존 앱에 URL을 변경·등록 갱신하고 연결을 새로 만들어야 합니다.
 Quick Tunnel은 임시 테스트용입니다. 주소를 고정하려면 named tunnel이나 아래 방식을 사용하세요.
 
-### 선택 B: 고정 도메인 + Caddy
+### B/Joint: 고정 도메인 + Caddy
 
 도메인의 DNS를 실행할 서버로 연결하고 80/443 포트를 열어 둡니다. `.env`의
 `PARTNER_ORIGIN=https://your-domain.example`, `PARTNER_HOST=your-domain.example`을 설정합니다.
@@ -129,9 +134,9 @@ docker compose --profile https up -d --build
 | 별도 OIDC Client ID / Secret | 뮤즈캣의 별도 로그인 앱 | `.env`의 `MUSECAT_LOGIN_CLIENT_ID` / `MUSECAT_LOGIN_CLIENT_SECRET` |
 | 파트너 OAuth Client ID / Secret | 샘플 초기화 스크립트 | 뮤즈캣 앱의 Direction B credential에 `PARTNER_OAUTH_CLIENT_ID` / `PARTNER_OAUTH_CLIENT_SECRET` 입력 |
 | 뮤즈캣 → 샘플 joint key | 샘플 초기화 스크립트 | 뮤즈캣 앱의 **파트너 발급 Joint 키**에 `MUSECAT_TO_PARTNER_KEY` 입력 |
-| 샘플 → 뮤즈캣 partner key | 뮤즈캣, 발급 순간에 표시 | `.env`의 `PARTNER_TO_MUSECAT_KEY` |
+| 전적 캐시 무효화 / 샘플 → 뮤즈캣 Joint 서버 키 | 뮤즈캣 Direction B의 전적 캐시 무효화 키. Joint와 공유하며 발급 순간에 표시 | `.env`의 `PARTNER_TO_MUSECAT_KEY` |
 
-등록되는 주소는 다음과 같습니다. `<origin>`은 샘플의 HTTPS origin입니다.
+등록되는 주소는 다음과 같습니다. `<origin>`은 설정한 정확한 `PARTNER_ORIGIN`입니다. 개발용 A/OIDC 콜백에는 HTTP localhost를 사용할 수 있으며 B/Joint와 공개 배포에는 HTTPS가 필요합니다.
 
 | 용도 | 주소 |
 | --- | --- |
@@ -158,7 +163,7 @@ outbox를 읽을 수 없습니다. 샘플은 현재 연결을 먼저 해제한 �
 1. `python3 scripts/init-env.py`를 다시 실행해 기존 값을 유지하며 빠진 설정을 추가합니다. `MUSECAT_LOGIN_CLIENT_ID`의 기본값은 `PARTNER_ID + "_login"`이며 ID 길이 제한에 맞춰 앞부분을 자릅니다. 기존 A/B/Joint 앱과 자격증명은 유지합니다.
 2. `/onboarding.json?flow=login`으로 **별도 앱**을 개발자 센터에 등록합니다. 앱 ID는 `MUSECAT_LOGIN_CLIENT_ID`와 일치해야 합니다. A와 `direction_a.login_enabled: true`를 켜고 콜백을 정확히 `<PARTNER_ORIGIN>/oidc/callback`으로 등록합니다. 이 양식에는 B·Joint가 없습니다. 연락처 등을 실제 정보로 바꾸고 등록을 저장하세요. 개발 테스트에는 운영자 심사가 필요하지 않습니다. 일반 공개에는 실서비스 심사를 요청하세요.
 3. 등록 후 로그인 앱의 Client Secret을 발급받아 `.env`의 `MUSECAT_LOGIN_CLIENT_SECRET`에 입력하고 `docker compose up -d --build --force-recreate`로 재생성합니다. 기존 A/B/Joint 앱의 시크릿을 넣지 마세요.
-4. 정확한 공개 HTTPS origin의 홈에서 **뮤즈캣으로 로그인**을 선택합니다. 데모 로그인이 필요하지 않습니다. 뮤즈캣에서 로그인하고 `openid profile arcade:read`에 동의하면 검증된 계정으로 로컬 세션을 만듭니다. 기존 데모 로그인 세션은 교체되지만 저장된 A/B/Joint grant를 합치거나 해제하지 않습니다.
+4. 설정한 정확한 `PARTNER_ORIGIN`의 홈에서(로컬 개발은 HTTP localhost, 공개 배포는 HTTPS) **뮤즈캣으로 로그인**을 선택합니다. 데모 로그인이 필요하지 않습니다. 뮤즈캣에서 로그인하고 `openid profile arcade:read`에 동의하면 검증된 계정으로 로컬 세션을 만듭니다. 기존 데모 로그인 세션은 교체되지만 저장된 A/B/Joint grant를 합치거나 해제하지 않습니다.
 5. 로그인한 홈의 근처 오락실 조회(`POST /oidc/nearby`)를 실행합니다. 서울 중심 반경 5 km의 고정된 읽기 요청이며 기기 위치를 수집하거나 오락실 전체 목록을 내보내지 않습니다. 이 로그인으로 `account:access` API 콘솔이나 데모 전적 도구의 권한이 생기지는 않습니다.
 6. **로그아웃**(`POST /logout`)하면 로컬 접근을 즉시 끝내고 worker가 암호화된 영속 outbox로 토큰 회수를 재시도합니다. 뮤즈캣 전체 로그아웃이나 Alice의 별도 A/B/Joint 연결 해제는 아닙니다. 회수 대기가 끝날 때까지 worker를 실행하세요.
 
@@ -166,7 +171,7 @@ outbox를 읽을 수 없습니다. 샘플은 현재 연결을 먼저 해제한 �
 
 ### 오류별 복구
 
-브라우저 화면에는 번역된 원인·다음 행동과 기존 오류 코드·HTTP 상태를 표시합니다. `invalid_origin`은 정확한 HTTPS origin, 설정·클라이언트 오류는 해당 앱과 자격증명, state·nonce·토큰 검증 오류는 새 로그인, 동의 거부는 사용자가 선택하는 재시도, 호출 제한은 대기 시간을 안내합니다. 콜백·인가 코드를 재사용하지 마세요. 원격 장애는 issuer·접속 가능 여부를 확인한 뒤 새 흐름을 시작합니다. 프로토콜/API 엔드포인트는 HTML 요청에도 JSON을 유지하며 브라우저 경로도 `?format=json`으로 진단할 수 있습니다. 알려진 원격 OAuth 오류 코드와 안전한 `Retry-After`만 전달하며 토큰·원격 응답 원문을 노출하지 않습니다. [오류 처리](partner/recovery.py)를 참고하세요.
+브라우저 화면에는 번역된 원인·다음 행동과 기존 오류 코드·HTTP 상태를 표시합니다. `invalid_origin`은 설정한 정확한 origin, 설정·클라이언트 오류는 해당 앱과 자격증명, state·nonce·토큰 검증 오류는 새 로그인, 동의 거부는 사용자가 선택하는 재시도, 호출 제한은 대기 시간을 안내합니다. 콜백·인가 코드를 재사용하지 마세요. 원격 장애는 issuer·접속 가능 여부를 확인한 뒤 새 흐름을 시작합니다. 프로토콜/API 엔드포인트는 HTML 요청에도 JSON을 유지하며 브라우저 경로도 `?format=json`으로 진단할 수 있습니다. 알려진 원격 OAuth 오류 코드와 안전한 `Retry-After`만 전달하며 토큰·원격 응답 원문을 노출하지 않습니다. [오류 처리](partner/recovery.py)를 참고하세요.
 
 위 내용은 구현된 절차입니다. Preview의 실제 OIDC 콜백 성공은 배포 후 별도로 기록해야 하며, 기존 A/B/Joint 검증 결과로 대체하지 않습니다.
 
@@ -175,12 +180,12 @@ outbox를 읽을 수 없습니다. 샘플은 현재 연결을 먼저 해제한 �
 테스트용 뮤즈캣 개발 계정을 사용합니다. 두 데모 계정은 동일한 데모 비밀번호를 공유하므로
 공개 배포에서는 등록된 테스트 참여자에게만 비밀번호를 전달하세요.
 
-1. 샘플 로그인 → **일반 OAuth 연결만** → 뮤즈캣 동의 → 프로필 조회와 토큰 갱신 후 조회
+1. 샘플 로그인 → **뮤즈캣 정보만 연결** → 뮤즈캣 동의 → 프로필 조회와 토큰 갱신 후 조회
 2. 연결 해제 → worker가 알림을 전송하고 뮤즈캣 설정에서도 승인 해제 확인
 3. 샘플에서 **원클릭 양방향 연결** → 두 계정과 권한 확인 → 한 번 동의 → 완료
 4. 뮤즈캣 설정의 외부 연결에서 전적 조회. 샘플은 `musecat-records/v1`을 반환합니다.
 5. 샘플 비공개 시 뮤즈캣은 `records_private`로 숨겨야 합니다. 공개 변경 후 새로고침은 분당 1회 제한을 따릅니다.
-6. 뮤즈캣의 **프로필에 공개**도 켰을 때만 익명 프로필에 전적이 표시되는지 확인
+6. 실서비스 승인을 받은 제공자에서 뮤즈캣의 **프로필에 공개**를 켜고 익명 프로필을 확인. 개발 앱의 전적은 소유자와 테스트 사용자에게만 표시
 7. 샘플의 **데모 access token 만료** → 1분 후 뮤즈캣 새로고침 → 자동 refresh 후 전적 복구
 8. 샘플에서 양쪽 해제 → 뮤즈캣 승인과 외부 전적 연결이 모두 해제되는지 확인
 9. 뮤즈캣 설정에서 양방향 연결 시작 → 샘플 로그인 → 공동 동의 → 완료 후 뮤즈캣 설정으로 복귀
