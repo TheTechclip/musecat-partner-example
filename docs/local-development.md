@@ -39,3 +39,29 @@ Keep the tunnel command running. A Quick Tunnel URL changes on restart: update t
 한국어: 뮤즈캣 전체 설치 없이 실제 preview와 연결하는 절차입니다. A/OIDC는 localhost HTTP로 연결할 수 있습니다. B/양방향은 `python scripts/dev-tunnel.py`로 HTTPS 접근 주소와 로컬 컨테이너 시작을 자동화하거나 고정 서버를 사용하세요. 로컬 검사와 실제 연결 완료는 구분합니다. 개발 앱은 소유자와 테스트 계정만 사용할 수 있고 일반 공개에는 승인이 필요합니다.
 
 日本語: Musecat 全体をインストールせず実際の Preview と接続します。A/OIDC は localhost HTTP を使えます。B/双方向は `python scripts/dev-tunnel.py` で HTTPS アドレスとローカルコンテナー起動を自動化するか、固定サーバーを使用します。ローカル検査と実接続完了は区別します。開発アプリは所有者とテスターのみ、本番公開には承認が必要です。
+
+## Isolated Compose preview deployments
+
+`compose.preview.yaml` runs the same app and outbox worker behind an existing
+HTTPS proxy without publishing host ports or starting Caddy. Supply a new
+private environment file to `docker compose --env-file /private/runtime.env -f
+compose.preview.yaml config --quiet` before deploying. Keep the public
+`PARTNER_ORIGIN` HTTPS even when the proxy's internal route uses HTTP to
+`app:8080`.
+
+Use a new application-scoped `preview-data` volume and freshly generated local
+session, encryption, demo, provider OAuth and inbound Joint keys. Never attach an
+existing sample volume to a different issuer or replace its encryption key. Keep
+the original `.env` and running/stopped demo deployments intact.
+
+Set `MUSECAT_ISSUER` and `MUSECAT_WEB_ORIGIN` to the matching isolated backend
+and frontend. Register the new partner ID and separate OIDC login ID using the
+actual test user's normal Developer Center session; do not reuse an old app's
+owner, grants or keys. `MUSECAT_CLIENT_SECRET`, `MUSECAT_LOGIN_CLIENT_SECRET` and
+`PARTNER_TO_MUSECAT_KEY` remain blank until that registration and key exchange.
+Health and onboarding pages can be checked first; working health does not mean
+A/OIDC/Joint consent has completed. Keep the worker running for revocation and
+record-visibility invalidation tests.
+
+Japanese Musecat callback/consent routes use `/jp/`; the sample UI language
+remains `ja`. Exact callback and same-origin completion checks remain required.

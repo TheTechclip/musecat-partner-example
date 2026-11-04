@@ -1,0 +1,49 @@
+# Isolated preview deployment. Coolify routes HTTPS externally to app:8080.
+x-partner: &partner
+  build: .
+  restart: unless-stopped
+  environment:
+    DATA_DIR: /data
+    PARTNER_ORIGIN: ${PARTNER_ORIGIN:?Set the isolated example HTTPS origin}
+    PARTNER_ID: ${PARTNER_ID:?Set the new preview registration ID}
+    PARTNER_OAUTH_CLIENT_ID: ${PARTNER_OAUTH_CLIENT_ID:?Set the new provider client ID}
+    PARTNER_OAUTH_CLIENT_SECRET: ${PARTNER_OAUTH_CLIENT_SECRET:?Generate a new provider secret}
+    MUSECAT_TO_PARTNER_KEY: ${MUSECAT_TO_PARTNER_KEY:?Generate a new inbound Joint key}
+    MUSECAT_TO_PARTNER_PREVIOUS_KEY: ${MUSECAT_TO_PARTNER_PREVIOUS_KEY:-}
+    PREVIOUS_KEY_EXPIRES_AT: ${PREVIOUS_KEY_EXPIRES_AT:-0}
+    PARTNER_TO_MUSECAT_KEY: ${PARTNER_TO_MUSECAT_KEY:-}
+    MUSECAT_CLIENT_SECRET: ${MUSECAT_CLIENT_SECRET:-}
+    MUSECAT_ISSUER: ${MUSECAT_ISSUER:?Set the isolated API issuer}
+    MUSECAT_WEB_ORIGIN: ${MUSECAT_WEB_ORIGIN:?Set the isolated web origin}
+    MUSECAT_LOGIN_CLIENT_ID: ${MUSECAT_LOGIN_CLIENT_ID:?Set the separate login registration ID}
+    MUSECAT_LOGIN_CLIENT_SECRET: ${MUSECAT_LOGIN_CLIENT_SECRET:-}
+    DEMO_PASSWORD: ${DEMO_PASSWORD:?Generate a new demo password}
+    SESSION_SECRET: ${SESSION_SECRET:?Generate a new session key}
+    DATA_KEY: ${DATA_KEY:?Generate a new data encryption key}
+  volumes:
+    - preview-data:/data
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  app:
+    <<: *partner
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+  worker:
+    <<: *partner
+    command: ["python", "-m", "partner.worker"]
+    depends_on:
+      app:
+        condition: service_healthy
+
+# Compose/Coolify namespaces this new volume per application; no existing volume.
+volumes:
+  preview-data:
