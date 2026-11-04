@@ -245,15 +245,20 @@ def profile_picture(value):
     return None
 
 
-def queue_record_invalidation(tx, uid, services):
-    active = any(
-        grant["user"] == uid and grant.get("exchanged") and not grant["revoked"]
+def has_record_audience(tx, uid, service):
+    return any(
+        grant["user"] == uid
+        and grant.get("exchanged")
+        and not grant["revoked"]
+        and service + ":read" in grant["scopes"]
         for _, grant in ledger().items(tx, "grant")
     )
-    if active and not current_app.config["PARTNER_TO_MUSECAT_KEY"]:
+
+
+def queue_record_invalidation(tx, uid, services):
+    services = [service for service in services if has_record_audience(tx, uid, service)]
+    if services and not current_app.config["PARTNER_TO_MUSECAT_KEY"]:
         raise ProtocolError("musecat_configuration_required", 503)
-    if not active:
-        return
     for service in services:
         ledger().put(
             tx,

@@ -3,7 +3,7 @@
 import time
 
 from . import create_app
-from .common import ProtocolError, ledger, now, remote
+from .common import FAMILY, ProtocolError, has_record_audience, ledger, now, remote
 
 
 def deliver(app):
@@ -16,6 +16,21 @@ def deliver(app):
                 continue
             try:
                 if job["kind"] == "records":
+                    with ledger().transaction() as tx:
+                        if not has_record_audience(
+                            tx,
+                            job["body"]["sub"].removeprefix("sample:"),
+                            job["body"]["service"],
+                        ):
+                            ledger().put(
+                                tx,
+                                "outbox_cancelled",
+                                jid,
+                                {**job, "reason": "no_audience", "cancelled_at": now()},
+                                now() + FAMILY,
+                            )
+                            ledger().delete(tx, "outbox", jid)
+                            continue
                     remote(
                         "POST",
                         "/partner/v1/records/invalidate",
