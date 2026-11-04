@@ -1,8 +1,8 @@
 # Local development with the real Musecat Preview
 
-The goal is a completed integration with **https://preview.musecat.app**, not merely a successful fixture test. You do not need to clone or install Musecat. New development apps work immediately for their owner and up to ten named testers; general-user production access needs review.
+The goal is a completed integration with **https://external-app.musecat.app**, not merely a successful fixture test. You do not need to clone or install Musecat. New development apps work immediately for their owner and up to ten named testers; general-user production access needs review.
 
-These instructions use the repository's default Musecat environment. The hosted [example app](https://example-app.musecat.app) may target an isolated environment; use its Developer Center and specification links for that deployment. For your own integration, run your own copy and register its generated ID and URLs, rather than registering the public example's JSON. If changing environments, set both `MUSECAT_ISSUER` and `MUSECAT_WEB_ORIGIN` to the matching backend/frontend and obtain that environment's credentials.
+This preview branch and the hosted [example app](https://example-app.musecat.app) use the same isolated environment: `MUSECAT_ISSUER=https://db-pr-99.musecat.app` and `MUSECAT_WEB_ORIGIN=https://external-app.musecat.app`. Register your app in [this environment's Developer Center](https://external-app.musecat.app/en/developer) and use [its integration specification](https://external-app.musecat.app/api/developer/spec). For your own integration, run your own copy and register its generated ID and URLs, rather than registering the public example's JSON. If switching environments, change both origins to the matching backend/frontend pair, register a new app, and obtain that environment's credentials; do not reuse previous grants or keys.
 
 Use the preview integration branch for the sample described here:
 
@@ -13,7 +13,7 @@ cd musecat-partner-example
 
 ## A / OIDC: localhost, without HTTPS
 
-1. Run `python3 scripts/init-env.py` and set `PARTNER_ORIGIN=http://localhost:8088` in `.env`. Keep `MUSECAT_ISSUER=https://db-dev.musecat.app` and `MUSECAT_WEB_ORIGIN=https://preview.musecat.app`.
+1. Run `python3 scripts/init-env.py` and set `PARTNER_ORIGIN=http://localhost:8088` in `.env`. Set `MUSECAT_ISSUER=https://db-pr-99.musecat.app` and `MUSECAT_WEB_ORIGIN=https://external-app.musecat.app`.
 2. Run `docker compose up -d --build` and open **http://localhost:8088**. This sample also supports `http://127.0.0.1:8088`; use one exact origin consistently.
 3. Register `/onboarding.json?flow=a` or `/onboarding.json?flow=login` in Developer Center. Replace contact details. Use the exact localhost callback; for OIDC, keep a separate app and its dedicated secret.
 4. Issue the app secret, configure `.env`, recreate the containers, and authorize using the Musecat account that owns the app or is in its named tester list.

@@ -18,11 +18,11 @@ A runnable **development and testing sample** for Musecat Preview. Python + Flas
 
 | Local sample defaults | URL |
 | --- | --- |
-| API / OAuth issuer | `https://db-dev.musecat.app` |
-| Developer Center | <https://preview.musecat.app/en/developer> |
-| Authoritative integration specification | <https://preview.musecat.app/api/developer/spec> |
+| API / OAuth issuer | `https://db-pr-99.musecat.app` |
+| Developer Center | <https://external-app.musecat.app/en/developer> |
+| Authoritative integration specification | <https://external-app.musecat.app/api/developer/spec> |
 
-The hosted [example app](https://example-app.musecat.app) can use an isolated Musecat environment; follow its own Developer Center and specification links when testing that deployment. To build your own integration, run your own copy and register its generated app ID and URLs. Do not register the hosted example's JSON as your app. Keep `MUSECAT_ISSUER` and `MUSECAT_WEB_ORIGIN` pointed at the matching backend/frontend environment; credentials and registrations are specific to that environment.
+This preview branch and the hosted [example app](https://example-app.musecat.app) use the same isolated environment: `MUSECAT_ISSUER=https://db-pr-99.musecat.app` and `MUSECAT_WEB_ORIGIN=https://external-app.musecat.app`. To build your own integration, run your own copy and register its generated app ID and URLs in the Developer Center above. Do not register the hosted example's JSON as your app. If switching to another environment, change both origins to its matching backend/frontend pair, register a new app, and obtain that environment's credentials; do not reuse grants or keys from the previous environment.
 
 This example uses the delegation scope `account:access` and the documented `/developer/v1/account/*` APIs as well as `/developer/v1/me`. The separate OIDC sign-in flow uses `openid profile arcade:read` with its own registered app and credentials; it does not grant `account:access`.
 
@@ -127,12 +127,12 @@ The sample starts without Musecat-issued keys. Sign in as `alice` or `bob` using
 | --- | --- |
 | OIDC login callback received by sample | `<origin>/oidc/callback` |
 | Direction A callback received by sample | `<origin>/oauth/musecat/callback` |
-| Direction B callback received by Musecat | `https://preview.musecat.app/api/user/connections/callback/<PARTNER_ID>` |
+| Direction B callback received by Musecat | `https://external-app.musecat.app/api/user/connections/callback/<PARTNER_ID>` |
 | Sample OAuth | `/oauth/authorize`, `/oauth/token`, `/oauth/userinfo`, `/oauth/revoke` |
 | Records | `<origin>/api/records/chunithm` |
 | Joint base | `<origin>/api/joint` |
 | Partner entry point when starting in Musecat | `<origin>/connect/musecat/start` |
-| Joint consent | `https://preview.musecat.app/en/connect/<PARTNER_ID>` (also `/kr/`, `/jp/`) |
+| Joint consent | `https://external-app.musecat.app/en/connect/<PARTNER_ID>` (also `/kr/`, `/jp/`) |
 
 After changing environment variables:
 
@@ -247,7 +247,7 @@ python examples/list_examples.py --all > /tmp/musecat-api-examples.sh
 
 ```sh
 .venv/bin/pip install -r requirements-dev.txt
-curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
+curl --fail --silent --show-error https://db-pr-99.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
 .venv/bin/python scripts/update-api-schema.py /tmp/musecat-developer-openapi.yaml
 .venv/bin/python -m unittest discover -v
 ```

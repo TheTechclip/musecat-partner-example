@@ -18,11 +18,11 @@ Musecat Preview と連携する **開発・テスト用サンプル**です。Py
 
 | ローカルサンプルの既定接続先 | URL |
 | --- | --- |
-| API / OAuth issuer | `https://db-dev.musecat.app` |
-| 開発者センター | <https://preview.musecat.app/jp/developer> |
-| 正式な連携仕様 | <https://preview.musecat.app/api/developer/spec> |
+| API / OAuth issuer | `https://db-pr-99.musecat.app` |
+| 開発者センター | <https://external-app.musecat.app/jp/developer> |
+| 正式な連携仕様 | <https://external-app.musecat.app/api/developer/spec> |
 
-[公開サンプル](https://example-app.musecat.app)は分離された Musecat 環境を使用する場合があります。そのデプロイを試すときは画面の開発者センターと連携仕様へのリンクに従ってください。独自の連携を作る場合は自分のサンプルを起動し、生成されたアプリ ID と URL で登録します。公開サンプルの JSON を自分のアプリとして登録しないでください。`MUSECAT_ISSUER` と `MUSECAT_WEB_ORIGIN` は同じ環境のバックエンドとフロントエンドを指定し、登録と認証情報はその環境で使用します。
+このプレビューブランチと[公開サンプル](https://example-app.musecat.app)は同じ分離環境を使用します。`MUSECAT_ISSUER=https://db-pr-99.musecat.app`、`MUSECAT_WEB_ORIGIN=https://external-app.musecat.app` を設定してください。独自の連携を作る場合は自分のサンプルを起動し、生成されたアプリ ID と URL を上記の開発者センターで登録します。公開サンプルの JSON を自分のアプリとして登録しないでください。他の環境に切り替える場合は両方の接続先を同じ環境のバックエンドとフロントエンドに変更し、新しいアプリを登録して認証情報を発行します。以前の環境の同意やキーは再利用しないでください。
 
 この例は権限委譲 scope `account:access` と `/developer/v1/account/*`、`/developer/v1/me` API を使用します。独立した OIDC ログインは別アプリと認証情報で `openid profile arcade:read` を要求し、`account:access` は付与しません。
 
@@ -127,12 +127,12 @@ Musecat 発行キーがなくてもサンプルは起動します。`.env` の `
 | --- | --- |
 | OIDC: サンプルが受け取るログイン callback | `<origin>/oidc/callback` |
 | Direction A: サンプルが受け取る callback | `<origin>/oauth/musecat/callback` |
-| Direction B: Musecat が受け取る callback | `https://preview.musecat.app/api/user/connections/callback/<PARTNER_ID>` |
+| Direction B: Musecat が受け取る callback | `https://external-app.musecat.app/api/user/connections/callback/<PARTNER_ID>` |
 | サンプル OAuth | `/oauth/authorize`, `/oauth/token`, `/oauth/userinfo`, `/oauth/revoke` |
 | 記録 | `<origin>/api/records/chunithm` |
 | Joint base | `<origin>/api/joint` |
 | Musecat から開始する際のパートナー入口 | `<origin>/connect/musecat/start` |
-| 共同同意画面 | `https://preview.musecat.app/jp/connect/<PARTNER_ID>` (`/kr/`, `/en/` も対応) |
+| 共同同意画面 | `https://external-app.musecat.app/jp/connect/<PARTNER_ID>` (`/kr/`, `/en/` も対応) |
 
 環境変数を変更した後は再作成します。
 
@@ -247,7 +247,7 @@ python examples/list_examples.py --all > /tmp/musecat-api-examples.sh
 
 ```sh
 .venv/bin/pip install -r requirements-dev.txt
-curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
+curl --fail --silent --show-error https://db-pr-99.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
 .venv/bin/python scripts/update-api-schema.py /tmp/musecat-developer-openapi.yaml
 .venv/bin/python -m unittest discover -v
 ```

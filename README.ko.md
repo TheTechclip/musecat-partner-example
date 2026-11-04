@@ -26,11 +26,11 @@ with Docker Compose and optional Caddy HTTPS. MIT licensed.
 
 | 항목 | 주소 |
 | --- | --- |
-| Musecat API / OAuth issuer | `https://db-dev.musecat.app` |
-| 웹 / 개발자 센터 | <https://preview.musecat.app/kr/developer> |
-| 최신 연동 계약 | <https://preview.musecat.app/api/developer/spec> |
+| Musecat API / OAuth issuer | `https://db-pr-99.musecat.app` |
+| 웹 / 개발자 센터 | <https://external-app.musecat.app/kr/developer> |
+| 최신 연동 계약 | <https://external-app.musecat.app/api/developer/spec> |
 
-[배포된 예제](https://example-app.musecat.app)는 격리된 뮤즈캣 환경을 사용할 수 있으므로 해당 배포를 시험할 때는 화면의 개발자 센터와 연동 스펙 링크를 따르세요. 직접 연동하려면 샘플을 별도로 실행하고 생성된 앱 ID와 URL로 등록하세요. 공개 예제의 JSON을 본인 앱으로 등록하지 마세요. `MUSECAT_ISSUER`와 `MUSECAT_WEB_ORIGIN`은 같은 환경의 백엔드와 프론트엔드를 가리켜야 하며 등록과 자격증명은 해당 환경에서만 사용합니다.
+이 프리뷰 브랜치와 [배포된 예제](https://example-app.musecat.app)는 같은 격리 환경을 사용합니다. `MUSECAT_ISSUER=https://db-pr-99.musecat.app`, `MUSECAT_WEB_ORIGIN=https://external-app.musecat.app`으로 설정하세요. 직접 연동하려면 샘플을 별도로 실행하고 생성된 앱 ID와 URL로 위 개발자 센터에 등록하세요. 공개 예제의 JSON을 본인 앱으로 등록하지 마세요. 다른 환경으로 전환할 때는 두 주소를 같은 환경의 백엔드와 프론트엔드로 함께 바꾸고 앱을 새로 등록해 자격증명을 발급받으세요. 이전 환경의 동의나 키를 재사용하지 마세요.
 
 샘플은 일반 기능 위임 scope `account:access`와 `/developer/v1/account/*`, `/developer/v1/me` API를 사용합니다.
 별도의 OIDC 로그인은 독립 앱과 자격증명으로 `openid profile arcade:read`를 요청하며, `account:access`를 부여하지 않습니다.
@@ -142,12 +142,12 @@ docker compose --profile https up -d --build
 | --- | --- |
 | OIDC: 샘플이 받는 로그인 콜백 | `<origin>/oidc/callback` |
 | Direction A: 샘플이 받는 뮤즈캣 콜백 | `<origin>/oauth/musecat/callback` |
-| Direction B: 뮤즈캣이 받는 샘플 콜백 | `https://preview.musecat.app/api/user/connections/callback/<PARTNER_ID>` |
+| Direction B: 뮤즈캣이 받는 샘플 콜백 | `https://external-app.musecat.app/api/user/connections/callback/<PARTNER_ID>` |
 | 샘플 OAuth | `/oauth/authorize`, `/oauth/token`, `/oauth/userinfo`, `/oauth/revoke` |
 | 전적 | `<origin>/api/records/chunithm` |
 | Joint base | `<origin>/api/joint` |
 | 뮤즈캣 시작 시 파트너 진입점 | `<origin>/connect/musecat/start` |
-| 공동 동의 화면 | `https://preview.musecat.app/kr/connect/<PARTNER_ID>` |
+| 공동 동의 화면 | `https://external-app.musecat.app/kr/connect/<PARTNER_ID>` |
 
 환경변수 변경 후:
 
@@ -273,7 +273,7 @@ python examples/list_examples.py --all > /tmp/musecat-api-examples.sh
 
 ```sh
 .venv/bin/pip install -r requirements-dev.txt
-curl --fail --silent --show-error https://db-dev.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
+curl --fail --silent --show-error https://db-pr-99.musecat.app/developer/openapi.yaml -o /tmp/musecat-developer-openapi.yaml
 .venv/bin/python scripts/update-api-schema.py /tmp/musecat-developer-openapi.yaml
 .venv/bin/python -m unittest discover -v
 ```
