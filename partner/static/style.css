@@ -5,3 +5,5 @@ textarea{display:block;width:100%;font:14px ui-monospace,monospace;padding:12px;
 
 .avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
 input[type="checkbox"] { width: auto; margin-right: .5rem; }
+#prepare details { margin: 16px 0; }
+#prepare li { line-height: 1.7; margin: 8px 0; overflow-wrap: anywhere; }

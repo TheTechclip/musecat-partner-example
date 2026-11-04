@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import sqlite3
 import time
 from contextlib import contextmanager
@@ -16,6 +17,14 @@ def digest(value):
 class Ledger:
     def __init__(self, path, key):
         self.path, self.cipher = path, Fernet(key.encode())
+        # New ledgers are private even under a permissive process umask. Keep
+        # existing files and their contents intact when opening an old ledger.
+        try:
+            descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        except FileExistsError:
+            pass
+        else:
+            os.close(descriptor)
         with self.transaction() as tx:
             tx.execute(
                 "CREATE TABLE IF NOT EXISTS ledger (kind TEXT, id TEXT, value BLOB, expires INTEGER, PRIMARY KEY(kind,id))"

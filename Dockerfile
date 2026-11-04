@@ -5,7 +5,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     && groupadd --gid 11000 sample \
     && useradd --uid 11000 --gid sample --create-home sample \
-    && mkdir /data && chown sample:sample /data
+    && mkdir /data && chown sample:sample /data && chmod 700 /data
 COPY partner ./partner
 USER sample
 EXPOSE 8080

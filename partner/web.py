@@ -173,7 +173,7 @@ def onboarding():
     if flow in {"a", "login"}:
         form.pop("direction_b")
     if flow == "b":
-        form.pop("direction_a")
+        form["direction_a"] = {"redirect_uris": [], "login_enabled": False}
     if flow == "login":
         form["partner_id"] = (
             current_app.config.get("MUSECAT_LOGIN_CLIENT_ID")

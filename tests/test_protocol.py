@@ -107,7 +107,30 @@ class ProtocolTests(unittest.TestCase):
         )
         self.assertEqual(response.location, target)
         response = self.post("/connect/joint", form={"csrf": self.csrf()})
-        self.assertIn("/ja/connect/example_test?", response.location)
+        self.assertIn("/jp/connect/example_test?", response.location)
+
+    def test_musecat_joint_entry_accepts_canonical_locale_callbacks_only(self):
+        web = self.app.config["MUSECAT_WEB_ORIGIN"]
+        for locale in ["kr", "en", "jp"]:
+            target = web + "/" + locale + "/connect/example_test"
+            response = self.http.get(
+                "/connect/musecat/start", base_url=ORIGIN,
+                query_string={"correlation_id": str(uuid.uuid4()), "return_to": target,
+                              "completion_uri": web + "/" + locale + "/settings/connections"},
+            )
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(response.location.startswith(target + "?intent="))
+        for target, completion in [
+            (web + "/ja/connect/example_test", web + "/ja/settings/connections"),
+            (web + "/jp/connect/example_test", "https://evil.example/jp/settings/connections"),
+            (web + "/jp/connect/example_test", web + "/en/settings/connections"),
+        ]:
+            response = self.http.get(
+                "/connect/musecat/start", base_url=ORIGIN,
+                query_string={"correlation_id": str(uuid.uuid4()), "return_to": target,
+                              "completion_uri": completion},
+            )
+            self.assertEqual(response.status_code, 400)
 
     def test_synthetic_record_vocabulary_matches_profile_presentation(self):
         code = self.code()
